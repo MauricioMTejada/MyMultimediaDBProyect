@@ -1,0 +1,27 @@
+/* src/components/RandomCountries.css */
+
+.grid-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); /* Se ajusta a la cantidad de columnas necesarias */
+    gap: 1rem;
+}
+
+.country-container {
+    background-color: white;
+    border-radius: 0.5rem; /* 8px */
+    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+    padding: 1rem; /* 16px */
+}
+
+.country-name {
+    font-size: 1.125rem; /* 18px */
+    line-height: 1.75rem; /* 28px */
+    font-weight: 600; /* semibold */
+}
+
+.country-flag {
+    width: 100px;   /* Tamaño de la bandera */
+    height: 50px;  /* Tamaño de la bandera */
+    object-fit: contain; /* Ajustar la imagen al tamaño */
+    margin-top: 0.5rem;
+}
