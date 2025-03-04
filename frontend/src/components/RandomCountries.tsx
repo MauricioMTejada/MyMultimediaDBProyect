@@ -1,6 +1,7 @@
-// src/components/RandomCountries.tsx
+// frontend/src/components/RandomCountries.tsx
 import React, { useState, useEffect } from 'react';
-import './RandomCountries.css'; // Importa el archivo css
+import './RandomCountries.css';
+import { API_BASE_URL } from '../utils/apiConfig'; // Importar la constante
 
 interface Country {
     id: number;
@@ -16,7 +17,7 @@ const RandomCountries: React.FC = () => {
     useEffect(() => {
         const fetchCountries = async () => {
             try {
-                const response = await fetch('http://localhost:3000/api/countries/random'); // <-- Especificar la ruta completa
+                const response = await fetch(`${API_BASE_URL}/countries/random`); // Usar la constante
                 if (!response.ok) {
                     throw new Error('Error al obtener los países');
                 }
@@ -48,7 +49,7 @@ const RandomCountries: React.FC = () => {
                     <img
                         src={country.flag}
                         alt={`Bandera de ${country.name}`}
-                        className="country-flag" // <-- Usa una clase CSS tradicional
+                        className="country-flag"
                     />
                 </div>
             ))}

@@ -1,6 +1,6 @@
 // src/models/UserMovie.js
 const { DataTypes } = require('sequelize');
-const sequelize = require('../config/database');
+const {sequelize} = require('../config/database');
 const Movie = require('./Movie');
 
 const UserMovie = sequelize.define('UserMovie', {

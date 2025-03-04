@@ -1,24 +1,18 @@
 // src/models/ejemplo.js
+const { sequelize } = require('../config/database');
 const { DataTypes } = require('sequelize');
-const sequelize = require('../config/database');
 
 const Ejemplo = sequelize.define('Ejemplo', {
     id: {
         type: DataTypes.INTEGER,
-        primaryKey: true,
         autoIncrement: true,
+        primaryKey: true,
     },
-    nombre: {
+    // ... otras columnas
+    name: {
         type: DataTypes.STRING,
-        allowNull: false,
-    },
-    descripcion: {
-        type: DataTypes.TEXT,
-    },
-    // Añade más campos según tus necesidades
-}, {
-    tableName: 'ejemplos', // Puedes especificar el nombre de la tabla
-    timestamps: true, // Añade campos createdAt y updatedAt
+        allowNull: false
+    }
 });
 
 module.exports = Ejemplo;

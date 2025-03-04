@@ -1,9 +1,9 @@
 // src/routes/ejemploRoutes.js
 const express = require('express');
 const router = express.Router();
-const ejemploController = require('../controllers/ejemploController');
+const ejemploController = require('../controllers/ejemploController'); // Importar el controlador correctamente
 
-router.get('/', ejemploController.getEjemplos);
-router.post('/', ejemploController.createEjemplo);
+// Ruta para obtener todos los ejemplos
+router.get('/', ejemploController.getAllEjemplos); // Usa el controlador correcto
 
 module.exports = router;

@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import Table from './Table';
 import { Movie, Country } from '../types/types'; // Asegúrate de que esta interfaz exista y esté bien definida
+import { API_BASE_URL } from '../utils/apiConfig'; // Importar la constante
 
 const AllMovies: React.FC = () => {
     const [movies, setMovies] = useState<Movie[]>([]);
@@ -11,7 +12,7 @@ const AllMovies: React.FC = () => {
 
     const fetchCountries = async () => {
         try {
-            const response = await fetch('http://localhost:3000/api/countries'); // Reemplaza con tu URL
+            const response = await fetch(`${API_BASE_URL}/countries`); // Utilizar API_BASE_URL, y eliminar /api
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
@@ -31,7 +32,7 @@ const AllMovies: React.FC = () => {
             setIsLoading(true);
             setError(null);
             try {
-                const response = await fetch('http://localhost:3000/api/movies'); // Reemplaza con tu URL
+                const response = await fetch(`${API_BASE_URL}/movies`); // Utilizar API_BASE_URL, y eliminar /api
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }

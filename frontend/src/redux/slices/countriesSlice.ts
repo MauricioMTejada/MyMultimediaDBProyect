@@ -1,6 +1,7 @@
 // src/slices/countriesSlice.ts
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { Country } from '../../types/types'; //Importamos la interface de types
+import { API_BASE_URL } from '../../utils/apiConfig';//Importamos la constante
 
 // Definimos el estado inicial
 interface CountriesState {
@@ -19,7 +20,7 @@ const initialState: CountriesState = {
 export const fetchCountries = createAsyncThunk<Country[], void>(
   'countries/fetchCountries',
   async () => {
-    const response = await fetch('http://localhost:3000/api/countries/');
+    const response = await fetch(`${API_BASE_URL}/countries/`); // Usar la constante
     if (!response.ok) {
       throw new Error('Error al obtener los países');
     }

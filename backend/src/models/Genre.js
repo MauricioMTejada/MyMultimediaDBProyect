@@ -1,6 +1,6 @@
 // src/models/Genre.js
 const { DataTypes } = require('sequelize');
-const sequelize = require('../config/database');
+const {sequelize} = require('../config/database');
 
 const Genre = sequelize.define('Genre', {
     id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
