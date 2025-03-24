@@ -19,10 +19,17 @@ const RandomCountries: React.FC = () => {
             try {
                 const response = await fetch(`${API_BASE_URL}/countries/random`); // Usar la constante
                 if (!response.ok) {
-                    throw new Error('Error al obtener los países');
+                    //manejo del error 404
+                    if (response.status === 404) {
+                        setError('No hay paises en la base de datos.');
+                    } else {
+                        throw new Error('Error al obtener los países'); //lanzar el error si es otro codigo
+                    }
                 }
-                const data: Country[] = await response.json();
-                setCountries(data);
+                if (response.ok) {
+                    const data: Country[] = await response.json();
+                    setCountries(data);
+                }
             } catch (err: any) {
                 setError(err.message);
             } finally {

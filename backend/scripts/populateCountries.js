@@ -7,8 +7,9 @@
 const axios = require('axios');
 const { Sequelize } = require('sequelize');
 require('dotenv').config();
-const Country = require('./src/models/Country'); // Importar el modelo Country
-const sequelize = require('./src/config/database');
+const Country = require('../src/models/Country'); // Importar el modelo Country
+const { sequelize } = require('../src/config/database'); // Importar la instancia de sequelize
+
 
 async function populateCountries() {
     try {

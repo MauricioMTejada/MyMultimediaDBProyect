@@ -5,7 +5,10 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "nodemon src/index.js"
+    "start": "nodemon src/index.js",
+    "populateCountries": "node scripts/populateCountries.js",
+    "populateMovies": "node scripts/populateMovies.js",
+    "checkConnection": "node scripts/checkConnection.js"
   },
   "keywords": [],
   "author": "",

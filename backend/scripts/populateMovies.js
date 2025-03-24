@@ -3,11 +3,11 @@ const csv = require('csv-parser');
 const fs = require('fs');
 const { Sequelize } = require('sequelize');
 require('dotenv').config();
-const Country = require('./src/models/Country'); // Importa el modelo Country
-const Movie = require('./src/models/Movie'); // Importa el modelo Movie
-const Genre = require('./src/models/Genre'); // Importa el modelo Genre
-const MovieGenre = require('./src/models/MovieGenre');
-const sequelize = require('./src/config/database');
+const Country = require('../src/models/Country'); // Correcto
+const Movie = require('../src/models/Movie'); // Correcto
+const Genre = require('../src/models/Genre'); // Correcto
+const MovieGenre = require('../src/models/MovieGenre'); // Correcto
+const { sequelize } = require('../src/config/database'); // Correcto
 
 async function populateMovies() {
     try {
@@ -26,13 +26,13 @@ async function populateMovies() {
                 for (const row of results) {
                   //4. buscar pais
                     const country = await Country.findOne({ where: { name: row.País } });
-                    if (country) {
-                      //5. crear pelicula
+                        if (country) {
+                        //5. crear pelicula
                         const movie = await Movie.create({
                             title: row.Título,
                             originalTitle: row['Título original'],
                             year: parseInt(row.Año),
-                            countryId: country.id,
+                            countryId: country.id, //se agrega el campo countryId
                             director: row.Dirección,
                             cast: row.Reparto,
                             companies: row.Compañías,

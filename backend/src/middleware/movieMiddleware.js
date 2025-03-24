@@ -16,10 +16,32 @@ const getAllMoviesMiddleware = async (req, res) => {
     }
 };
 
-const uploadMoviesJsonMiddleware = (req, res) => {
-    // Llama al controlador para subir las peliculas.
-    movieController.uploadMoviesToDatabase(req, res);
-}
+const uploadMoviesJsonMiddleware = async (req, res, next) => { //se mantiene `next` por buenas practicas
+    try {
+        // Eliminar csvCountry antes de enviar los datos
+        const moviesData = req.body.map(({ csvCountry, ...movie }) => ({
+          title: movie['Título'],
+          originalTitle: movie['Título original'],
+          year: parseInt(movie['Año']), //convertir a numero
+          countryId: movie.countryId, //agregar countryId
+          director: movie['Dirección'],
+          cast: movie.Reparto,
+          companies: movie['Compañías'],
+          genres: movie['Género'], //modificado a genres
+          synopsis: movie.Sinopsis,
+          image: movie.Imagen,
+          otherTitles: movie.otherTitles || [],
+        })); // <-- Modificación aquí
+        // Agregar los datos ya modificados a req.body para que se pueda utilizar en el controlador
+        req.body = moviesData;
+        // console.log("Datos a enviar desde movieMiddleware.js:", req.body);
+        // Llama al controlador para subir las peliculas.
+        movieController.uploadMoviesToDatabase(req, res); // <-- Llamada al controlador
+    } catch (error) {
+        console.error('Error en uploadMoviesJsonMiddleware:', error);
+        res.status(500).json({ error: 'Error al subir las películas' });
+    }
+};
 
 module.exports = {
     getAllMoviesMiddleware,

@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import Papa, { ParseResult } from 'papaparse';
 import Table from './Table.tsx';
 import { Movie } from '../types/types'; //Importamos la interface de types
-
+import { API_BASE_URL } from '../utils/apiConfig'; // Importamos la constante
 import { useAppDispatch, useAppSelector } from '../hooks.ts'; // Importa los hooks personalizados
 import { fetchCountries } from '../redux/slices/countriesSlice.ts'; // Importa el thunk
 
@@ -77,14 +77,19 @@ const UploadMovies: React.FC = () => {
             return;
         }
 
+        // Eliminar csvCountry antes de enviar los datos
+        const dataToSend = data.map(({ csvCountry, ...movie }) => movie); // <-- Modificación aquí
+        console.log("Datos a enviar desde UploadMovies.tsx:", dataToSend); // <-- Nuevo console.log
+
+
         try {
-            const response = await fetch('http://localhost:3000/api/movies/upload-json', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(data),
-            });
+        const response = await fetch(`${API_BASE_URL}/movies/upload-json`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(dataToSend), // <-- Enviamos los datos limpios
+        });
 
             if (response.ok) {
                 setMessage('Datos cargados correctamente.');

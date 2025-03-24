@@ -1,6 +1,5 @@
 // src/controllers/movieController.js
 const { db } = require('../config/database'); // Importar db
-
 const fs = require('fs');
 const path = require('path');
 
@@ -17,9 +16,10 @@ const getAllMovies = async (req, res, Movie) => { // Recibir Movie como parametr
 
 const uploadMoviesToDatabase = async (req, res) => {
     try {
-        const jsonData = req.jsonData;
+        const jsonData = req.body; // Accedemos a los datos con req.body, dado que viene modificado por el middleware
         // Insertar los datos en la base de datos
-        await db.Movie.bulkCreate(jsonData); //utilizar db.Movie
+        const moviesCreated = await db.Movie.bulkCreate(jsonData); //utilizar db.Movie
+        // console.log("pelicula agregada:", moviesCreated[0].title); // <-- Imprimir el titulo de la pelicula
 
         res.status(201).json({ message: 'Películas agregadas a la base de datos correctamente' });
     } catch (error) {

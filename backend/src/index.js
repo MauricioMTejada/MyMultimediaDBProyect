@@ -42,6 +42,7 @@ app.use('/countries', countryRoutes); //eliminar api de las rutas.
 app.use('/movies', movieRoutes); //eliminar api de las rutas.
 
 // Sincronizar modelos con la base de datos (crea tablas si no existen)
+// sequelize.sync({ force: true })
 sequelize.sync({ alter: true })
     .then(() => {
         console.log('Base de datos sincronizada.');
