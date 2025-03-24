@@ -9,20 +9,24 @@ interface Props {
     headers: string[];
     countries: Country[];
     onCountryChange: (rowIndex: number, newCountryId: number | undefined) => void;
+    onCheckboxChange: (movieId: number, checked: boolean) => void; // Nueva prop
+    isAssociated: boolean; // Nueva prop
 }
 
-const TableRow: React.FC<Props> = ({ row, rowIndex, headers, countries, onCountryChange }) => {
+const TableRow: React.FC<Props> = ({ row, rowIndex, headers, countries, onCountryChange, onCheckboxChange, isAssociated }) => {
     return (
         <tr key={rowIndex}>
             {headers.map((header, colIndex) => (
                 <TableCell
-                    key={`${rowIndex}-${colIndex}`} // Correct key generation
+                    key={`${rowIndex}-${colIndex}`}
                     header={header}
                     row={row}
                     rowIndex={rowIndex}
-                    colIndex={colIndex} // Pass the colIndex
+                    colIndex={colIndex}
                     countries={countries}
                     onCountryChange={onCountryChange}
+                    onCheckboxChange={onCheckboxChange} // Pasar la prop
+                    isAssociated={isAssociated} // Pasar la prop
                 />
             ))}
         </tr>

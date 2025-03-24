@@ -1,7 +1,8 @@
 // src/components/Table/TableCell.tsx
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Movie, Country } from '../../types/types';
-import { truncateText } from '../../utils/utils'; // Importamos la función
+import { truncateText } from '../../utils/utils';
+// import { API_BASE_URL } from '../../utils/apiConfig';
 
 interface Props {
     header: string;
@@ -10,9 +11,23 @@ interface Props {
     colIndex: number;
     countries: Country[];
     onCountryChange: (rowIndex: number, newCountryId: number | undefined) => void;
+    onCheckboxChange: (movieId: number, checked: boolean) => void; // Nueva prop
+    isAssociated: boolean; // Nueva prop
 }
 
-const TableCell: React.FC<Props> = ({ header, row, rowIndex, colIndex, countries, onCountryChange }) => {
+const TableCell: React.FC<Props> = ({ header, row, rowIndex, colIndex, countries, onCountryChange, onCheckboxChange, isAssociated }) => {
+    const [isChecked, setIsChecked] = useState<boolean>(isAssociated);
+
+    useEffect(() => {
+        setIsChecked(isAssociated);
+    }, [isAssociated]);
+
+    const handleCheckboxChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+        const checked = event.target.checked;
+        setIsChecked(checked);
+        onCheckboxChange(row.id, checked);
+    };
+
     let cellValue: any;
     if (header === 'image') {
         cellValue = row.image;
@@ -84,6 +99,16 @@ const TableCell: React.FC<Props> = ({ header, row, rowIndex, colIndex, countries
         return (
             <td key={`${rowIndex}-${colIndex}`} className="px-6 py-4 whitespace-normal">
                 {cellValue}
+            </td>
+        );
+    } else if (header === 'Asociar') {
+        return (
+            <td key={`${rowIndex}-${colIndex}`} className="px-6 py-4 whitespace-nowrap">
+                <input
+                    type="checkbox"
+                    checked={isChecked}
+                    onChange={handleCheckboxChange}
+                />
             </td>
         );
     } else {

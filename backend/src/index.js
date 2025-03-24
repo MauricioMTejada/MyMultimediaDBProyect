@@ -4,6 +4,7 @@ const {sequelize, db } = require('./config/database'); // importar db y sequeliz
 const ejemploRoutes = require('./routes/ejemploRoutes');
 const countryRoutes = require('./routes/countryRoutes');
 const movieRoutes = require('./routes/movieRoutes'); // <-- Importar movieRoutes
+const userRoutes = require('./routes/userRoutes'); // <-- Importar userRoutes
 const cors = require('cors');
 require('dotenv').config();
 
@@ -45,6 +46,7 @@ app.use(cors(corsOptions));
 app.use('/ejemplos', ejemploRoutes); //eliminar api de las rutas.
 app.use('/countries', countryRoutes); //eliminar api de las rutas.
 app.use('/movies', movieRoutes); //eliminar api de las rutas.
+app.use('/users', userRoutes); // <-- Usar userRoutes
 
 // Sincronizar modelos con la base de datos (crea tablas si no existen)
 // sequelize.sync({ force: true })

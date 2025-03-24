@@ -1,18 +1,22 @@
 // backend/src/middleware/movieMiddleware.js
 const { db } = require('../config/database'); //importar db
 const movieController = require('../controllers/movieController');
+const userController = require('../controllers/userController');
 
 const getAllMoviesMiddleware = async (req, res) => {
     try {
-        // Aquí podrías agregar validaciones o modificaciones antes de llamar al controlador
-        // Por ejemplo, podrías paginar, filtrar, etc., y luego pasar esos datos al controlador.
-
         // Llama al controlador para obtener las películas y pasarle db.Movie
-        movieController.getAllMovies(req, res, db.Movie); //Pasar el modelo directamente desde db
+        const movies = await movieController.getAllMovies(db.Movie, db.UserMovie); //Pasar el modelo directamente desde db
+        const associatedMovieIds = await userController.getUserMovies(db.UserMovie, 1); // Reemplaza 1 por el userId
 
+        const moviesWithAssociation = movies.map(movie => ({
+            ...movie.dataValues,
+            isAssociated: associatedMovieIds.includes(movie.id),
+        }));
+        res.json(moviesWithAssociation);
     } catch (error) {
         console.error('Error en getAllMoviesMiddleware:', error);
-        res.status(500).json({ error: 'Error al obtener las películas' });
+        res.status(500).json({ error: error.message });
     }
 };
 
@@ -32,18 +36,52 @@ const uploadMoviesJsonMiddleware = async (req, res, next) => { //se mantiene `ne
           image: movie.Imagen,
           otherTitles: movie.otherTitles || [],
         })); // <-- Modificación aquí
-        // Agregar los datos ya modificados a req.body para que se pueda utilizar en el controlador
-        req.body = moviesData;
-        // console.log("Datos a enviar desde movieMiddleware.js:", req.body);
         // Llama al controlador para subir las peliculas.
-        movieController.uploadMoviesToDatabase(req, res); // <-- Llamada al controlador
+        const moviesCreated = await movieController.uploadMoviesToDatabase(db.Movie, moviesData); // <-- Llamada al controlador
+        res.status(201).json({ message: 'Películas agregadas a la base de datos correctamente' });
     } catch (error) {
         console.error('Error en uploadMoviesJsonMiddleware:', error);
-        res.status(500).json({ error: 'Error al subir las películas' });
+        res.status(500).json({ error: error.message });
+    }
+};
+
+const createUserMovieMiddleware = async (req, res) => {
+    const { userId, movieId } = req.params;
+    try {
+        const result = await movieController.createUserMovie(db.UserMovie, userId, movieId);
+        res.status(201).json(result);
+    } catch (error) {
+        console.error('Error en createUserMovieMiddleware:', error);
+        res.status(500).json({ error: error.message });
+    }
+};
+
+const deleteUserMovieMiddleware = async (req, res) => {
+    const { userId, movieId } = req.params;
+    try {
+        const result = await movieController.deleteUserMovie(db.UserMovie, userId, movieId);
+        res.status(200).json(result);
+    } catch (error) {
+        console.error('Error en deleteUserMovieMiddleware:', error);
+        res.status(500).json({ error: error.message });
+    }
+};
+
+const getIsMovieAssociatedMiddleware = async (req, res) => {
+    const { userId, movieId } = req.params;
+    try {
+        const result = await movieController.getIsMovieAssociated(db.UserMovie, userId, movieId);
+        res.status(200).json(result);
+    } catch (error) {
+        console.error('Error en getIsMovieAssociatedMiddleware:', error);
+        res.status(500).json({ error: error.message });
     }
 };
 
 module.exports = {
     getAllMoviesMiddleware,
-    uploadMoviesJsonMiddleware
+    uploadMoviesJsonMiddleware,
+    createUserMovieMiddleware,
+    deleteUserMovieMiddleware,
+    getIsMovieAssociatedMiddleware
 };
