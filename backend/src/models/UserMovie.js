@@ -1,9 +1,11 @@
 // src/models/UserMovie.js
 const { DataTypes } = require('sequelize');
 const { sequelize } = require('../config/database');
-const Movie = require('./Movie');
+// const Movie = require('./Movie'); // Remove this line
+// const User = require('./User'); // Remove this line
 
 const UserMovie = sequelize.define('UserMovie', {
+    // ... (rest of your UserMovie model definition)
     id: {
         type: DataTypes.INTEGER,
         primaryKey: true,
@@ -36,13 +38,15 @@ const UserMovie = sequelize.define('UserMovie', {
         type: DataTypes.BOOLEAN,
         defaultValue: true, //valor por defecto
         allowNull: false //no puede ser nulo
-    }
+    },
 }, {
     timestamps: false,
 });
 
-// Definir la relación: Una UserMovie pertenece a una Movie (uno a muchos)
-UserMovie.belongsTo(Movie, { foreignKey: 'movieId' });
-Movie.hasMany(UserMovie, { foreignKey: 'movieId' });
+// Remove the association definitions from here
+// UserMovie.belongsTo(Movie, { foreignKey: 'movieId' });
+// Movie.hasMany(UserMovie, { foreignKey: 'movieId' });
+// UserMovie.belongsTo(User, { foreignKey: 'userId' });
+// User.hasMany(UserMovie, { foreignKey: 'userId' });
 
 module.exports = UserMovie;

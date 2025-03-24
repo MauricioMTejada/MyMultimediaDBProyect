@@ -13,7 +13,8 @@ const Country = require('./models/Country');
 const Genre = require('./models/Genre');
 const MovieGenre = require('./models/MovieGenre');
 const UserMovie = require('./models/UserMovie');
-const Ejemplo = require('./models/ejemplo'); // importar el modelo
+const Ejemplo = require('./models/ejemplo');
+const User = require('./models/User')
 
 //agregar los modelos a db
 db.Movie = Movie;
@@ -21,7 +22,11 @@ db.Country = Country;
 db.Genre = Genre;
 db.MovieGenre = MovieGenre;
 db.UserMovie = UserMovie;
-db.Ejemplo = Ejemplo; //agregar el modelo
+db.Ejemplo = Ejemplo;
+db.User = User;
+
+// Require associations AFTER all models are defined
+require('./models/associations'); // Add this line
 
 const app = express();
 const PORT = process.env.PORT || 3000;
