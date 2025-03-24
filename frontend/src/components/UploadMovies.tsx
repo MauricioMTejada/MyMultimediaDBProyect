@@ -1,7 +1,7 @@
 // src/components/UploadMovies.tsx
 import React, { useState, useEffect } from 'react';
 import Papa, { ParseResult } from 'papaparse';
-import Table from './Table.tsx';
+import TableUpload from './Table/TableUpload';
 import { Movie } from '../types/types'; //Importamos la interface de types
 import { API_BASE_URL } from '../utils/apiConfig'; // Importamos la constante
 import { useAppDispatch, useAppSelector } from '../hooks.ts'; // Importa los hooks personalizados
@@ -127,7 +127,7 @@ const UploadMovies: React.FC = () => {
                 <div className="w-full">
                     {/* ahora pasamos los datos en la nueva forma */}
                     {/* AQUI ESTÁ EL CAMBIO */}
-                    <Table data={data} countries={countries} onCountryChange={handleCountryChange} />
+                    <TableUpload data={data} countries={countries} onCountryChange={handleCountryChange} />
                     <button
                         onClick={handleSubmit}
                         className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-4"

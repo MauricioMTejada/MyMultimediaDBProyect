@@ -1,23 +1,23 @@
 // src/components/AllMovies.tsx
 import React, { useState, useEffect } from 'react';
-import Table from './Table';
-import { Movie, Country } from '../types/types'; // Asegúrate de que esta interfaz exista y esté bien definida
-import { API_BASE_URL } from '../utils/apiConfig'; // Importar la constante
+import Table from './Table/Table'; // Importa el nuevo Table.tsx
+import { Movie, Country } from '../types/types';
+import { API_BASE_URL } from '../utils/apiConfig';
 
 const AllMovies: React.FC = () => {
     const [movies, setMovies] = useState<Movie[]>([]);
     const [isLoading, setIsLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
-    const [allCountries, setAllCountries] = useState<Country[]>([]); // Agrega el estado para los paises.
+    const [allCountries, setAllCountries] = useState<Country[]>([]);
 
     const fetchCountries = async () => {
         try {
-            const response = await fetch(`${API_BASE_URL}/countries`); // Utilizar API_BASE_URL, y eliminar /api
+            const response = await fetch(`${API_BASE_URL}/countries`);
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
             const data = await response.json();
-            setAllCountries(data); // guarda los paises en el estado.
+            setAllCountries(data);
         } catch (err: any) {
             setError(err.message || 'An unknown error occurred while fetching countries.');
         }
@@ -32,7 +32,7 @@ const AllMovies: React.FC = () => {
             setIsLoading(true);
             setError(null);
             try {
-                const response = await fetch(`${API_BASE_URL}/movies`); // Utilizar API_BASE_URL, y eliminar /api
+                const response = await fetch(`${API_BASE_URL}/movies`);
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
@@ -48,11 +48,10 @@ const AllMovies: React.FC = () => {
         fetchMovies();
     }, []);
 
-    //funcion que actualiza el estado de la pelicula.
-    const handleCountryChange = (rowIndex: number, countryId: number | undefined) => { //cambia el tipo de dato del parametro
+    const handleCountryChange = (rowIndex: number, countryId: number | undefined) => {
         setMovies(prevMovies => {
             const newMovies = [...prevMovies];
-            newMovies[rowIndex].countryId = countryId; // ya puede ser undefined
+            newMovies[rowIndex].countryId = countryId;
             return newMovies;
         });
     };
@@ -67,7 +66,6 @@ const AllMovies: React.FC = () => {
 
     return (
         <div className="w-full">
-            {/* Si existe data de peliculas, renderiza la tabla. */}
             {movies.length > 0 && <Table data={movies} countries={allCountries} onCountryChange={handleCountryChange} />}
         </div>
     );
