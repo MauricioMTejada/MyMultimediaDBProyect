@@ -3,15 +3,9 @@
 import UploadMovies from "./components/UploadMovies";
 import AllMovies from "./components/AllMovies";
 import { Link, Routes, Route } from "react-router-dom"; // Importa solo lo necesario
+import UserMoviesPage from "./components/movies/UserMoviesPage"; // Import the UserMoviesPage component
 
-// Create dummy components for Movies and Series pages
-const MoviesPage = () => (
-	<div className="p-4">
-		<h2 className="text-2xl font-bold">Movies</h2>
-		{/* Add your movies content here */}
-	</div>
-);
-
+// Create dummy components for Series pages
 const SeriesPage = () => (
 	<div className="p-4">
 		<h2 className="text-2xl font-bold">Series</h2>
@@ -56,7 +50,7 @@ function App() {
 			{/* Page Content */}
 			<Routes>
 				<Route path="/" element={<HomePage />} />
-				<Route path="/movies" element={<MoviesPage />} />
+				<Route path="/movies" element={<UserMoviesPage />} /> {/* Use UserMoviesPage here */}
 				<Route path="/series" element={<SeriesPage />} />
 			</Routes>
 		</div>

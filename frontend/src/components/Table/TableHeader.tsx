@@ -7,7 +7,7 @@ interface Props {
 
 const TableHeader: React.FC<Props> = ({ headers }) => {
     const headersToShow = headers.map(header => {
-        if (header === 'País') return 'País y csvCountry';
+        if (header === 'País y csvCountry') return 'País';
         if (header === 'titles') return 'Títulos';
         if (header === 'data') return 'Datos';
         if (header === 'otherData') return 'Otros Datos';

@@ -1,13 +1,12 @@
-// backend/src/middleware/movieMiddleware.js
+// src/middleware/movieMiddleware.js
 const { db } = require('../config/database'); //importar db
 const movieController = require('../controllers/movieController');
-const userController = require('../controllers/userController');
 
 const getAllMoviesMiddleware = async (req, res) => {
     try {
         // Llama al controlador para obtener las películas y pasarle db.Movie
-        const movies = await movieController.getAllMovies(db.Movie, db.UserMovie); //Pasar el modelo directamente desde db
-        const associatedMovieIds = await userController.getUserMovies(db.UserMovie, 1); // Reemplaza 1 por el userId
+        const movies = await movieController.getAllMovies(db.Movie); //Pasar el modelo directamente desde db
+        const associatedMovieIds = await movieController.getUserMovies(db.UserMovie, 1); // Reemplaza 1 por el userId
 
         const moviesWithAssociation = movies.map(movie => ({
             ...movie.dataValues,
@@ -78,10 +77,68 @@ const getIsMovieAssociatedMiddleware = async (req, res) => {
     }
 };
 
+const getMovieByIdMiddleware = async (req, res) => {
+    const { movieId } = req.params;
+    try {
+        const movie = await db.Movie.findByPk(movieId);
+        if (!movie) {
+            return res.status(404).json({ error: 'Película no encontrada' });
+        }
+        res.json(movie);
+    } catch (error) {
+        console.error('Error al obtener la película:', error);
+        res.status(500).json({ error: 'Error al obtener la película' });
+    }
+};
+
+const createMovieMiddleware = async (req, res) => {
+    try {
+        const newMovie = await db.Movie.create(req.body);
+        res.status(201).json(newMovie);
+    } catch (error) {
+        console.error('Error al crear la película:', error);
+        res.status(500).json({ error: 'Error al crear la película' });
+    }
+};
+
+const deleteMovieMiddleware = async (req, res) => {
+    const { movieId } = req.params;
+    try {
+        const movie = await db.Movie.findByPk(movieId);
+        if (!movie) {
+            return res.status(404).json({ error: 'Película no encontrada' });
+        }
+        await movie.destroy();
+        res.json({ message: 'Película eliminada' });
+    } catch (error) {
+        console.error('Error al eliminar la película:', error);
+        res.status(500).json({ error: 'Error al eliminar la película' });
+    }
+};
+
+const updateMovieMiddleware = async (req, res) => {
+    const { movieId } = req.params;
+    try {
+        const movie = await db.Movie.findByPk(movieId);
+        if (!movie) {
+            return res.status(404).json({ error: 'Película no encontrada' });
+        }
+        await movie.update(req.body);
+        res.json(movie);
+    } catch (error) {
+        console.error('Error al actualizar la película:', error);
+        res.status(500).json({ error: 'Error al actualizar la película' });
+    }
+};
+
 module.exports = {
     getAllMoviesMiddleware,
     uploadMoviesJsonMiddleware,
     createUserMovieMiddleware,
     deleteUserMovieMiddleware,
-    getIsMovieAssociatedMiddleware
+    getIsMovieAssociatedMiddleware,
+    getMovieByIdMiddleware,
+    createMovieMiddleware,
+    deleteMovieMiddleware,
+    updateMovieMiddleware
 };

@@ -1,6 +1,6 @@
 // src/components/AllMovies.tsx
 import React, { useState, useEffect } from 'react';
-import Table from './Table/Table'; // Importa el nuevo Table.tsx
+import Table from './Table/Table';
 import { Movie, Country } from '../types/types';
 import { API_BASE_URL } from '../utils/apiConfig';
 
@@ -66,7 +66,7 @@ const AllMovies: React.FC = () => {
 
     return (
         <div className="w-full">
-            {movies.length > 0 && <Table data={movies} countries={allCountries} onCountryChange={handleCountryChange} />}
+            {movies.length > 0 && <Table data={movies} countries={allCountries} onCountryChange={handleCountryChange} isAssociated={true} />}
         </div>
     );
 };

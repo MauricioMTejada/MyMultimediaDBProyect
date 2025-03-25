@@ -9,8 +9,8 @@ interface Props {
     headers: string[];
     countries: Country[];
     onCountryChange: (rowIndex: number, newCountryId: number | undefined) => void;
-    onCheckboxChange: (movieId: number, checked: boolean) => void; // Nueva prop
-    isAssociated: boolean; // Nueva prop
+    onCheckboxChange: (movieId: number, checked: boolean) => void;
+    isAssociated: boolean; // Prop obligatoria
 }
 
 const TableRow: React.FC<Props> = ({ row, rowIndex, headers, countries, onCountryChange, onCheckboxChange, isAssociated }) => {
@@ -25,8 +25,8 @@ const TableRow: React.FC<Props> = ({ row, rowIndex, headers, countries, onCountr
                     colIndex={colIndex}
                     countries={countries}
                     onCountryChange={onCountryChange}
-                    onCheckboxChange={onCheckboxChange} // Pasar la prop
-                    isAssociated={isAssociated} // Pasar la prop
+                    onCheckboxChange={onCheckboxChange}
+                    isAssociated={isAssociated}
                 />
             ))}
         </tr>

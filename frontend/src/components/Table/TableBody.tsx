@@ -8,11 +8,11 @@ interface Props {
     headers: string[];
     countries: Country[];
     onCountryChange: (rowIndex: number, newCountryId: number | undefined) => void;
-    onCheckboxChange: (movieId: number, checked: boolean) => void; // Nueva prop
-    // associatedMovies: number[]; // Eliminar esta línea
+    onCheckboxChange: (movieId: number, checked: boolean) => void;
+    isAssociated: boolean; // Prop obligatoria
 }
 
-const TableBody: React.FC<Props> = ({ data, headers, countries, onCountryChange, onCheckboxChange }) => { // Eliminar associatedMovies
+const TableBody: React.FC<Props> = ({ data, headers, countries, onCountryChange, onCheckboxChange, isAssociated }) => {
     return (
         <tbody className="bg-white divide-y divide-gray-200">
             {data.map((row, rowIndex) => (
@@ -23,8 +23,8 @@ const TableBody: React.FC<Props> = ({ data, headers, countries, onCountryChange,
                     headers={headers}
                     countries={countries}
                     onCountryChange={onCountryChange}
-                    onCheckboxChange={onCheckboxChange} // Pasar la prop
-                    isAssociated={row.isAssociated} // Pasar la prop
+                    onCheckboxChange={onCheckboxChange}
+                    isAssociated={isAssociated}
                 />
             ))}
         </tbody>

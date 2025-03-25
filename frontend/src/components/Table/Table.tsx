@@ -9,9 +9,10 @@ interface Props {
     data: Movie[];
     countries: Country[];
     onCountryChange: (rowIndex: number, newCountryId: number | undefined) => void;
+    isAssociated: boolean; // Prop obligatoria
 }
 
-const Table: React.FC<Props> = ({ data, countries, onCountryChange }) => {
+const Table: React.FC<Props> = ({ data, countries, onCountryChange, isAssociated }) => {
     if (data.length === 0) {
         return <p>No hay datos para mostrar.</p>;
     }
@@ -21,11 +22,11 @@ const Table: React.FC<Props> = ({ data, countries, onCountryChange }) => {
     headers.splice(2, 0, 'titles');
     headers.splice(3, 0, 'data');
     headers.splice(4, 0, 'otherData');
-    headers.push('Asociar');
+    if (isAssociated) headers.push('Asociar');
 
     const handleCheckboxChange = async (movieId: number, checked: boolean) => {
         try {
-            const response = await fetch(`${API_BASE_URL}/users/1/movies/${movieId}`, { // Reemplaza 1 por el userId
+            const response = await fetch(`${API_BASE_URL}/users/1/movies/${movieId}`, {
                 method: checked ? 'POST' : 'DELETE',
             });
             if (!response.ok) {
@@ -40,7 +41,7 @@ const Table: React.FC<Props> = ({ data, countries, onCountryChange }) => {
         <div className="overflow-x-auto">
             <table className="min-w-full divide-y divide-gray-200">
                 <TableHeader headers={headers} />
-                <TableBody data={data} headers={headers} countries={countries} onCountryChange={onCountryChange} onCheckboxChange={handleCheckboxChange} />
+                <TableBody data={data} headers={headers} countries={countries} onCountryChange={onCountryChange} onCheckboxChange={handleCheckboxChange} isAssociated={isAssociated} />
             </table>
         </div>
     );

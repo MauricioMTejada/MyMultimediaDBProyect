@@ -1,15 +1,28 @@
 // src/models/UserMovie.js
 const { DataTypes } = require('sequelize');
 const { sequelize } = require('../config/database');
-// const Movie = require('./Movie'); // Remove this line
-// const User = require('./User'); // Remove this line
 
 const UserMovie = sequelize.define('UserMovie', {
-    // ... (rest of your UserMovie model definition)
     id: {
         type: DataTypes.INTEGER,
         primaryKey: true,
         autoIncrement: true,
+    },
+    userId: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        references: {
+            model: 'Users', // Nombre de la tabla en la base de datos
+            key: 'id',
+        },
+    },
+    movieId: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        references: {
+            model: 'Movies', // Nombre de la tabla en la base de datos
+            key: 'id',
+        },
     },
     watched: {
         type: DataTypes.ENUM('Si', 'No', 'Viendo'),
@@ -24,9 +37,9 @@ const UserMovie = sequelize.define('UserMovie', {
         defaultValue: [],
     },
     type: {
-        type: DataTypes.ENUM('Película', 'Serie', 'Documental'), //valores permitidos
-        defaultValue: 'Película', //valor por defecto
-        allowNull: false, // no puede ser nulo
+        type: DataTypes.ENUM('Película', 'Serie', 'Documental'),
+        defaultValue: 'Película',
+        allowNull: false,
     },
     note: {
         type: DataTypes.TEXT,
@@ -34,19 +47,13 @@ const UserMovie = sequelize.define('UserMovie', {
     recommendationSource: {
         type: DataTypes.STRING,
     },
-    selectOriginalTitle: { //nuevo campo
+    selectOriginalTitle: {
         type: DataTypes.BOOLEAN,
-        defaultValue: true, //valor por defecto
-        allowNull: false //no puede ser nulo
+        defaultValue: true,
+        allowNull: false
     },
 }, {
     timestamps: false,
 });
-
-// Remove the association definitions from here
-// UserMovie.belongsTo(Movie, { foreignKey: 'movieId' });
-// Movie.hasMany(UserMovie, { foreignKey: 'movieId' });
-// UserMovie.belongsTo(User, { foreignKey: 'userId' });
-// User.hasMany(UserMovie, { foreignKey: 'userId' });
 
 module.exports = UserMovie;
