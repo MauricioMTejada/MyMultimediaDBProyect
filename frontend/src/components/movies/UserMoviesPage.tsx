@@ -1,57 +1,58 @@
 // src/components/movies/UserMoviesPage.tsx
 import React, { useState, useEffect } from 'react';
-import UserMovieTable from './UserMovieTable';
-import MovieTable from './MovieTable';
+import Table from '../Table/Table';
 import { API_BASE_URL } from '../../utils/apiConfig';
-import { Movie } from '../../types/types';
-
-// Interfaz para los datos de UserMovie
-interface UserMovie {
-  id: number;
-  userId: number;
-  movieId: number;
-  watched: 'Si' | 'No' | 'Viendo';
-  watchedDate: Date | null;
-  rewatchedDate: Date[] | null;
-  type: 'Película' | 'Serie' | 'Documental';
-  note: string | null;
-  recommendationSource: string | null;
-  selectOriginalTitle: boolean;
-  // ... otros campos de UserMovie
-}
+import { Movie, CombinedMovieData, UserMovie, Country } from '../../types/types';
 
 const UserMoviesPage: React.FC = () => {
-  const [userMovies, setUserMovies] = useState<UserMovie[]>([]);
-  const [movies, setMovies] = useState<Movie[]>([]);
+  const [combinedData, setCombinedData] = useState<CombinedMovieData[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-
+  const [countries, setCountries] = useState<Country[]>([]);
   const userId = 1;
 
   useEffect(() => {
-    const fetchUserMovies = async () => {
+    const fetchData = async () => {
       setIsLoading(true);
       setError(null);
       try {
-        const response = await fetch(`${API_BASE_URL}/users/${userId}/user-movies`);
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
+        const userMoviesResponse = await fetch(`${API_BASE_URL}/users/${userId}/user-movies`);
+        if (!userMoviesResponse.ok) {
+          throw new Error(`HTTP error! status: ${userMoviesResponse.status}`);
         }
-        const data: UserMovie[] = await response.json();
-        setUserMovies(data);
+        const userMoviesData: UserMovie[] = await userMoviesResponse.json();
 
-        const movieIds = data.map((userMovie: UserMovie) => userMovie.movieId);
-
-        const moviesPromises = movieIds.map(async (movieId: number) => {
-          const movieResponse = await fetch(`${API_BASE_URL}/movies/${movieId}`);
+        const moviesPromises = userMoviesData.map(async (userMovie) => {
+          const movieResponse = await fetch(`${API_BASE_URL}/movies/${userMovie.movieId}`);
           if (!movieResponse.ok) {
             throw new Error(`HTTP error! status: ${movieResponse.status}`);
           }
-          return movieResponse.json();
+          const movieData: Movie = await movieResponse.json();
+          return {
+            ...movieData,
+            userMovieId: userMovie.id,
+            userId: userMovie.userId,
+            watched: userMovie.watched,
+            watchedDate: userMovie.watchedDate,
+            rewatchedDate: userMovie.rewatchedDate,
+            type: userMovie.type,
+            note: userMovie.note,
+            recommendationSource: userMovie.recommendationSource,
+            selectOriginalTitle: userMovie.selectOriginalTitle,
+          } as CombinedMovieData;
         });
 
-        const moviesData: Movie[] = await Promise.all(moviesPromises);
-        setMovies(moviesData);
+        const combinedMoviesData: CombinedMovieData[] = await Promise.all(moviesPromises);
+        setCombinedData(combinedMoviesData);
+
+        // Fetch de los paises
+        const countriesResponse = await fetch(`${API_BASE_URL}/countries`);
+        if (!countriesResponse.ok) {
+          throw new Error(`HTTP error! status: ${countriesResponse.status}`);
+        }
+        const countriesData: Country[] = await countriesResponse.json();
+        setCountries(countriesData);
+
       } catch (err: any) {
         setError(err.message || 'An unknown error occurred.');
       } finally {
@@ -59,8 +60,12 @@ const UserMoviesPage: React.FC = () => {
       }
     };
 
-    fetchUserMovies();
+    fetchData();
   }, [userId]);
+
+  const handleCountryChange = (rowIndex: number, newCountryId: number | undefined) => {
+    console.log(`Cambiando el país de la fila ${rowIndex} a ${newCountryId}`);
+  };
 
   if (isLoading) {
     return <p>Cargando datos...</p>;
@@ -72,15 +77,14 @@ const UserMoviesPage: React.FC = () => {
 
   return (
     <div className="p-4">
-      <h2 className="text-2xl font-bold">Datos de UserMovie del Usuario</h2>
-      <div className="flex space-x-4">
-        <div className="w-1/2">
-          {userMovies.length > 0 && <UserMovieTable userMovies={userMovies} />}
-        </div>
-        <div className="w-1/2">
-          {movies.length > 0 && <MovieTable data={movies} />}
-        </div>
-      </div>
+      <h2 className="text-2xl font-bold">Datos Combinados de Películas y UserMovie</h2>
+      {combinedData.length > 0 && (
+        <Table
+          data={combinedData}
+          countries={countries}
+          onCountryChange={handleCountryChange}
+        />
+      )}
     </div>
   );
 };

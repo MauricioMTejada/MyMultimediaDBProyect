@@ -10,6 +10,7 @@ router.get('/:userId/movies', getUserMoviesMiddleware);
 
 // Nueva ruta para obtener los datos de UserMovie de un usuario
 router.get('/:userId/user-movies', async (req, res) => {
+  console.log('userRoutes.js - GET /:userId/user-movies - req.params:', req.params); // Agregar console.log
   const userId = req.params.userId;
 
   try {
@@ -25,8 +26,20 @@ router.get('/:userId/user-movies', async (req, res) => {
 });
 
 // Rutas para las asociaciones UserMovie (MOVER DESDE movieRoutes.js)
-router.post('/:userId/movies/:movieId', createUserMovieMiddleware); // Crear asociación
-router.delete('/:userId/movies/:movieId', deleteUserMovieMiddleware); // Eliminar asociación
-router.get('/:userId/movies/:movieId', getIsMovieAssociatedMiddleware); // Saber si está asociada
+router.post('/:userId/movies/:movieId', (req, res, next) => { // Agregar console.log
+  console.log('userRoutes.js - POST /:userId/movies/:movieId - req.body:', req.body);
+  console.log('userRoutes.js - POST /:userId/movies/:movieId - req.params:', req.params);
+  next();
+}, createUserMovieMiddleware); // Crear asociación
+router.delete('/:userId/movies/:movieId', (req, res, next) => { // Agregar console.log
+  console.log('userRoutes.js - DELETE /:userId/movies/:movieId - req.body:', req.body);
+  console.log('userRoutes.js - DELETE /:userId/movies/:movieId - req.params:', req.params);
+  next();
+}, deleteUserMovieMiddleware); // Eliminar asociación
+router.get('/:userId/movies/:movieId', (req, res, next) => { // Agregar console.log
+  console.log('userRoutes.js - GET /:userId/movies/:movieId - req.body:', req.body);
+  console.log('userRoutes.js - GET /:userId/movies/:movieId - req.params:', req.params);
+  next();
+}, getIsMovieAssociatedMiddleware); // Saber si está asociada
 
 module.exports = router;

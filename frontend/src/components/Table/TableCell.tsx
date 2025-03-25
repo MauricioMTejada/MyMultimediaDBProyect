@@ -1,47 +1,50 @@
 // src/components/Table/TableCell.tsx
-import React, { useState, useEffect } from 'react';
-import { Movie, Country } from '../../types/types';
+import React, { useEffect } from 'react';
+import { Country, CombinedMovieData, Movie } from '../../types/types';
+import { useAppDispatch, useAppSelector } from '../../redux/hooks';
+import { toggleMovieAssociation, setAssociation } from '../../redux/slices/movieAssociationSlice';
 import { truncateText } from '../../utils/utils';
+import { API_BASE_URL } from '../../utils/apiConfig';
 
 interface Props {
     header: string;
-    row: Movie;
+    row: CombinedMovieData | Movie; // Acepta ambos tipos de datos
     rowIndex: number;
     colIndex: number;
     countries: Country[];
     onCountryChange: (rowIndex: number, newCountryId: number | undefined) => void;
-    onCheckboxChange: (movieId: number, checked: boolean) => void;
-    isAssociated: boolean; // Prop obligatoria
+    isAssociated?: boolean; // Opcional
 }
 
-const TableCell: React.FC<Props> = ({ header, row, rowIndex, colIndex, countries, onCountryChange, onCheckboxChange, isAssociated }) => {
-    const [isChecked, setIsChecked] = useState<boolean>(false);
+const TableCell: React.FC<Props> = ({ header, row, rowIndex, colIndex, countries, onCountryChange, isAssociated }) => {
+    const dispatch = useAppDispatch();
+    const userId = 1; // Reemplazar por el userId real
+    const isChecked = useAppSelector((state) => state.movieAssociation.associations[row.id] || false);
 
     useEffect(() => {
+        console.log(`TableCell.tsx - useEffect - Checking association for movieId: ${row.id}`); // Agregar console.log
         const checkAssociation = async () => {
             try {
-                const response = await fetch(`http://localhost:3000/users/1/movies/${row.id}`);
+                const response = await fetch(`${API_BASE_URL}/users/1/movies/${row.id}`);
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
                 const data = await response.json();
-                setIsChecked(data.isAssociated);
+                dispatch(setAssociation({ movieId: row.id, checked: data.isAssociated }));
             } catch (error) {
                 console.error('Error checking association:', error);
             }
         };
-        if (isAssociated) {
+        if (isAssociated && !('userMovieId' in row)) {
             checkAssociation();
         }
-    }, [isAssociated, row.id]);
+    }, [dispatch, isAssociated, row.id]);
 
-    const handleCheckboxChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const handleCheckboxChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const checked = event.target.checked;
-        setIsChecked(checked);
-        onCheckboxChange(row.id, checked);
+        console.log(`TableCell.tsx - onChange - row.id: ${row.id}, checked: ${checked}`);
+        dispatch(toggleMovieAssociation({ userId, movieId: row.id, checked }));
     };
-
-    console.log("Datos en TableCell:", { header, row }); // Imprimir los datos por consola
 
     let cellValue: any;
     let cellContent: any;
@@ -56,9 +59,6 @@ const TableCell: React.FC<Props> = ({ header, row, rowIndex, colIndex, countries
             "No Image"
         );
     } else if (header === 'titles') {
-        console.log("Original Title:", row.originalTitle);
-        console.log("Alternative Title:", row.title);
-        console.log("Other Titles:", row.otherTitles);
         cellContent = (
             <div className="flex flex-col">
                 <div><b>Original:</b> {row.originalTitle ? truncateText(row.originalTitle) : "N/A"}</div>
@@ -103,7 +103,19 @@ const TableCell: React.FC<Props> = ({ header, row, rowIndex, colIndex, countries
                 <div className="mt-1 text-gray-500">csvCountry: {row.csvCountry}</div>
             </div>
         );
-    } else if (header === 'Asociar') {
+    } else if (header === 'Datos de usuario' && 'userMovieId' in row) {
+        const rewatchedDates = row.rewatchedDate; // Variable auxiliar
+        cellContent = (
+            <div className="flex flex-col">
+                <div><b>Visto:</b> {row.watched ? row.watched : "N/A"}</div>
+                <div><b>Fecha Visto:</b> {row.watchedDate ? row.watchedDate.toLocaleDateString() : "N/A"}</div>
+                <div><b>Fecha Vuelta a ver:</b> {rewatchedDates && Array.isArray(rewatchedDates) && rewatchedDates.length > 0 ? rewatchedDates.map((date: Date, index: number) => <span key={index}>{date.toLocaleDateString()}{index < rewatchedDates.length - 1 ? ', ' : ''}</span>) : "N/A"}</div>
+                <div><b>Tipo:</b> {row.type ? row.type : "N/A"}</div>
+                <div><b>Nota:</b> {row.note ? row.note : "N/A"}</div>
+                <div><b>Origen de Recomendación:</b> {row.recommendationSource ? row.recommendationSource : "N/A"}</div>
+            </div>
+        );
+    } else if (header === 'Asociar' && isAssociated) {
         cellContent = (
             <input
                 type="checkbox"
@@ -113,7 +125,7 @@ const TableCell: React.FC<Props> = ({ header, row, rowIndex, colIndex, countries
             />
         );
     } else {
-        cellValue = row[header as keyof Movie];
+        cellValue = row[header as keyof (CombinedMovieData | Movie)];
         cellContent = cellValue !== undefined && cellValue !== null ? cellValue : "N/A";
     }
 

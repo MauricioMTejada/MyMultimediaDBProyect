@@ -45,7 +45,9 @@ const uploadMoviesJsonMiddleware = async (req, res, next) => { //se mantiene `ne
 };
 
 const createUserMovieMiddleware = async (req, res) => {
-    const { userId, movieId } = req.params;
+    console.log('createUserMovieMiddleware - req.body:', req.body); // Agregar console.log
+    console.log('createUserMovieMiddleware - req.params:', req.params); // Agregar console.log
+    const { userId, movieId } = req.body; // Ahora se extrae de req.body
     try {
         const result = await movieController.createUserMovie(db.UserMovie, userId, movieId);
         res.status(201).json(result);
@@ -56,7 +58,9 @@ const createUserMovieMiddleware = async (req, res) => {
 };
 
 const deleteUserMovieMiddleware = async (req, res) => {
-    const { userId, movieId } = req.params;
+    console.log('deleteUserMovieMiddleware - req.body:', req.body); // Agregar console.log
+    console.log('deleteUserMovieMiddleware - req.params:', req.params); // Agregar console.log
+    const { userId, movieId } = req.params; // Se mantiene en req.params para DELETE
     try {
         const result = await movieController.deleteUserMovie(db.UserMovie, userId, movieId);
         res.status(200).json(result);
