@@ -27,12 +27,12 @@ const Table: React.FC<Props> = ({ data, countries, onCountryChange, isAssociated
         headers = Object.keys(data[0]).filter(header => !columnsToExclude.includes(header) && header !== 'image' && header !== 'originalTitle' && header !== 'otherTitles' && header !== 'title' && header !== 'year' && header !== 'director' && header !== 'cast' && header !== 'companies' && header !== 'countryId' && header !== 'genres' && header !== 'synopsis' && header !== 'isAssociated');
 
         // Insertamos las columnas especiales en el orden deseado
-        headers.splice(1, 0, 'image');
-        headers.splice(2, 0, 'titles');
-        headers.splice(3, 0, 'data');
-        headers.splice(4, 0, 'otherData');
-        // Insertamos la nueva columna "Datos de usuario"
-        headers.splice(5, 0, 'Datos de usuario');
+        // Insertamos la nueva columna "Datos de usuario" en la posición 1
+        headers.splice(1, 0, 'Datos de usuario');
+        headers.splice(2, 0, 'image');
+        headers.splice(3, 0, 'titles');
+        headers.splice(4, 0, 'data');
+        headers.splice(5, 0, 'otherData');
     } else {
         headers = Object.keys(data[0]).filter(header => header !== 'image' && header !== 'originalTitle' && header !== 'otherTitles' && header !== 'title' && header !== 'year' && header !== 'director' && header !== 'cast' && header !== 'companies' && header !== 'countryId' && header !== 'genres' && header !== 'synopsis' && header !== 'isAssociated');
         headers.splice(1, 0, 'image');
