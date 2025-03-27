@@ -5,13 +5,14 @@ import TableHeader from './TableHeader';
 import TableBody from './TableBody';
 
 interface Props {
-    data: CombinedMovieData[] | Movie[]; // Acepta ambos tipos de datos
+    data: (CombinedMovieData | Movie)[]; // Acepta ambos tipos de datos
     countries: Country[];
     onCountryChange: (rowIndex: number, newCountryId: number | undefined) => void;
     isAssociated?: boolean; // Opcional
+    hideIdColumn?: boolean; // Nueva prop para ocultar la columna "id"
 }
 
-const Table: React.FC<Props> = ({ data, countries, onCountryChange, isAssociated }) => {
+const Table: React.FC<Props> = ({ data, countries, onCountryChange, isAssociated, hideIdColumn = false }) => {
     if (data.length === 0) {
         return <p>No hay datos para mostrar.</p>;
     }
@@ -26,6 +27,11 @@ const Table: React.FC<Props> = ({ data, countries, onCountryChange, isAssociated
         // Filtramos las columnas que no queremos mostrar
         headers = Object.keys(data[0]).filter(header => !columnsToExclude.includes(header) && header !== 'image' && header !== 'originalTitle' && header !== 'otherTitles' && header !== 'title' && header !== 'year' && header !== 'director' && header !== 'cast' && header !== 'companies' && header !== 'countryId' && header !== 'genres' && header !== 'synopsis' && header !== 'isAssociated');
 
+        // Si hideIdColumn es true, eliminamos "id" de los headers
+        if (hideIdColumn) {
+            headers = headers.filter(header => header !== 'id');
+        }
+
         // Insertamos las columnas especiales en el orden deseado
         // Insertamos la nueva columna "Datos de usuario" en la posición 1
         headers.splice(1, 0, 'Datos de usuario');
@@ -35,13 +41,17 @@ const Table: React.FC<Props> = ({ data, countries, onCountryChange, isAssociated
         headers.splice(5, 0, 'otherData');
     } else {
         headers = Object.keys(data[0]).filter(header => header !== 'image' && header !== 'originalTitle' && header !== 'otherTitles' && header !== 'title' && header !== 'year' && header !== 'director' && header !== 'cast' && header !== 'companies' && header !== 'countryId' && header !== 'genres' && header !== 'synopsis' && header !== 'isAssociated');
+        // Si hideIdColumn es true, eliminamos "id" de los headers
+        if (hideIdColumn) {
+            headers = headers.filter(header => header !== 'id');
+        }
         headers.splice(1, 0, 'image');
         headers.splice(2, 0, 'titles');
         headers.splice(3, 0, 'data');
         headers.splice(4, 0, 'otherData');
         if (isAssociated) headers.push('Asociar');
     }
-    console.log('Table.tsx - onCheckboxChange:'); // Mover console.log aquí
+    // console.log('Table.tsx - onCheckboxChange:'); // Mover console.log aquí
 
     return (
         <div className="overflow-x-auto">

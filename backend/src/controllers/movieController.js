@@ -1,73 +1,164 @@
-// src/controllers/movieController.js
-const getAllMovies = async (Movie) => {
+// backend/src/controllers/movieController.js
+const { Movie, UserMovie } = require('../models/associations'); // Importar los modelos
+
+const getAllMovies = async (req, res) => {
+    const userId = req.query.userId; // Obtener el userId de la query
     try {
-        const movies = await Movie.findAll();
-        return movies;
+        const movies = await Movie.findAll(); // Buscar todas las películas
+
+        const moviesWithAssociation = await Promise.all(movies.map(async movie => {
+            const isAssociated = userId ? await UserMovie.findOne({ where: { userId, movieId: movie.id } }) : false;
+            return {
+                ...movie.get({ plain: true }),
+                isAssociated: !!isAssociated
+            };
+        }));
+
+        res.json(moviesWithAssociation); // Enviar las películas con la información de asociación
     } catch (error) {
         console.error('Error al obtener las películas:', error);
-        throw new Error('Error al obtener las películas');
+        res.status(500).json({ message: 'Error al obtener las películas' });
     }
 };
 
-const uploadMoviesToDatabase = async (Movie, moviesData) => {
+const getMovieById = async (req, res) => {
+    const { movieId } = req.params;
     try {
+        const movie = await Movie.findByPk(movieId);
+        if (!movie) {
+            return res.status(404).json({ message: 'Película no encontrada' });
+        }
+        res.json(movie);
+    } catch (error) {
+        console.error('Error al obtener la película por ID:', error);
+        res.status(500).json({ message: 'Error al obtener la película por ID' });
+    }
+};
+
+const createMovie = async (req, res) => {
+    try {
+        const newMovie = await Movie.create(req.body);
+        res.status(201).json(newMovie);
+    } catch (error) {
+        console.error('Error al crear la película:', error);
+        res.status(500).json({ message: 'Error al crear la película' });
+    }
+};
+
+const updateMovie = async (req, res) => {
+    const { movieId } = req.params;
+    try {
+        const movie = await Movie.findByPk(movieId);
+        if (!movie) {
+            return res.status(404).json({ message: 'Película no encontrada' });
+        }
+        await movie.update(req.body);
+        res.json(movie);
+    } catch (error) {
+        console.error('Error al actualizar la película:', error);
+        res.status(500).json({ message: 'Error al actualizar la película' });
+    }
+};
+
+const deleteMovie = async (req, res) => {
+    const { movieId } = req.params;
+    try {
+        const movie = await Movie.findByPk(movieId);
+        if (!movie) {
+            return res.status(404).json({ message: 'Película no encontrada' });
+        }
+        await movie.destroy();
+        res.status(204).send(); // No Content
+    } catch (error) {
+        console.error('Error al eliminar la película:', error);
+        res.status(500).json({ message: 'Error al eliminar la película' });
+    }
+};
+
+const uploadMoviesToDatabase = async (req, res) => {
+    try {
+        const moviesData = req.body;
         const moviesCreated = await Movie.bulkCreate(moviesData);
-        return moviesCreated;
+        res.status(201).json(moviesCreated);
     } catch (error) {
         console.error('Error al subir las películas a la base de datos:', error);
-        throw new Error('Error al subir las películas a la base de datos');
+        res.status(500).json({ message: 'Error al subir las películas a la base de datos' });
     }
 };
 
-const createUserMovie = async (UserMovie, userId, movieId) => {
+const createUserMovie = async (req, res) => {
+    const { userId, movieId } = req.params;
+    console.log('createUserMovie - userId:', userId, 'movieId:', movieId); // Loguear userId y movieId
     try {
         const userMovie = await UserMovie.create({ userId, movieId });
-        return { message: 'Asociación creada correctamente', userMovie };
+        console.log('createUserMovie - Asociación creada:', userMovie); // Loguear la asociación creada
+        res.status(201).json({ message: 'Asociación creada correctamente', userMovie });
     } catch (error) {
-        console.error('Error al crear la asociación:', error);
-        throw new Error('Error al crear la asociación');
+        console.error('createUserMovie - Error al crear la asociación:', error); // Loguear el error
+        res.status(500).json({ message: 'Error al crear la asociación', error: error.message }); // Enviar el mensaje de error
     }
 };
 
-const deleteUserMovie = async (UserMovie, userId, movieId) => {
+const deleteUserMovie = async (req, res) => {
+    const { userId, movieId } = req.params;
     try {
         const userMovie = await UserMovie.findOne({ where: { userId, movieId } });
         if (!userMovie) {
-            throw new Error('Asociación no encontrada');
+            return res.status(404).json({ message: 'Asociación no encontrada' });
         }
         await userMovie.destroy();
-        return { message: 'Asociación eliminada correctamente' };
+        res.json({ message: 'Asociación eliminada correctamente' });
     } catch (error) {
         console.error('Error al eliminar la asociación:', error);
-        throw new Error('Error al eliminar la asociación');
+        res.status(500).json({ message: 'Error al eliminar la asociación' });
     }
 };
 
-const getIsMovieAssociated = async (UserMovie, userId, movieId) => {
+const getIsMovieAssociated = async (req, res) => {
+    const { userId, movieId } = req.params;
     try {
         const userMovie = await UserMovie.findOne({ where: { userId, movieId } });
-        return { isAssociated: !!userMovie };
+        res.json({ isAssociated: !!userMovie });
     } catch (error) {
         console.error('Error al comprobar la asociación:', error);
-        throw new Error('Error al comprobar la asociación');
+        res.status(500).json({ message: 'Error al comprobar la asociación' });
     }
 };
 
-const getUserMovies = async (UserMovie, userId) => {
+const getUserMovies = async (req, res) => {
+    const { userId } = req.params;
     try {
         const userMovies = await UserMovie.findAll({
             where: { userId },
-            attributes: ['movieId'],
+            include: [{
+                model: Movie,
+                attributes: { exclude: ['createdAt', 'updatedAt'] } // Excluir atributos innecesarios
+            }],
+            attributes: { exclude: ['createdAt', 'updatedAt'] } // Excluir atributos innecesarios
         });
-        return userMovies.map(userMovie => userMovie.movieId);
+
+        const combinedData = userMovies.map(userMovie => {
+            const movieData = userMovie.Movie.get({ plain: true }); // Obtener los datos de la película como un objeto plano
+            const userMovieData = userMovie.get({ plain: true }); // Obtener los datos de UserMovie como un objeto plano
+            return {
+                ...movieData, // Usar los datos planos de la película
+                ...userMovieData, // Usar los datos planos de UserMovie
+            };
+        });
+
+        res.json(combinedData);
     } catch (error) {
-        console.error('Error al obtener las películas del usuario:', error);
-        throw new Error('Error al obtener las películas del usuario');
+        console.error('Error al obtener las películas asociadas al usuario:', error);
+        res.status(500).json({ message: 'Error al obtener las películas asociadas al usuario' });
     }
 };
 
 module.exports = {
     getAllMovies,
+    getMovieById,
+    createMovie,
+    updateMovie,
+    deleteMovie,
     uploadMoviesToDatabase,
     createUserMovie,
     deleteUserMovie,

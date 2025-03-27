@@ -25,7 +25,7 @@ export interface Country {
 export interface CombinedMovieData extends Movie {
     userMovieId: number;
     userId: number;
-    watched?: 'Si' | 'No' | 'Viendo'; // Opcional
+    watched: 'Si' | 'No' | 'Viendo'; // Ahora es obligatorio
     watchedDate?: Date | null; // Opcional
     rewatchedDate?: Date[] | null; // Opcional
     type?: 'Película' | 'Serie' | 'Documental'; // Opcional

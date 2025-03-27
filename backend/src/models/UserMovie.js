@@ -12,7 +12,7 @@ const UserMovie = sequelize.define('UserMovie', {
         type: DataTypes.INTEGER,
         allowNull: false,
         references: {
-            model: 'Users', // Nombre de la tabla en la base de datos
+            model: 'User', // Nombre del modelo
             key: 'id',
         },
     },
@@ -20,7 +20,7 @@ const UserMovie = sequelize.define('UserMovie', {
         type: DataTypes.INTEGER,
         allowNull: false,
         references: {
-            model: 'Movies', // Nombre de la tabla en la base de datos
+            model: 'Movie', // Nombre del modelo
             key: 'id',
         },
     },

@@ -16,6 +16,19 @@ const getUserMovies = async (UserMovie, userId) => {
     }
 };
 
+const getUserMoviesData = async (UserMovie, userId) => {
+    try {
+        const userMovies = await UserMovie.findAll({
+            where: { userId },
+        });
+        return userMovies;
+    } catch (error) {
+        console.error(error);
+        throw new Error('Error al obtener los datos de UserMovie del usuario.');
+    }
+};
+
 module.exports = {
-    getUserMovies
+    getUserMovies,
+    getUserMoviesData
 };

@@ -3,8 +3,8 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { Country } from '../../types/types'; //Importamos la interface de types
 import { API_BASE_URL } from '../../utils/apiConfig';//Importamos la constante
 
-// Definimos el estado inicial
-interface CountriesState {
+// Exportar la interfaz CountriesState
+export interface CountriesState {
   data: Country[];
   status: 'idle' | 'loading' | 'succeeded' | 'failed';
   error: string | null;

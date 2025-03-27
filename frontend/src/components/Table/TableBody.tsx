@@ -4,7 +4,7 @@ import TableCell from './TableCell';
 import { Country, CombinedMovieData, Movie } from '../../types/types';
 
 interface Props {
-    data: CombinedMovieData[] | Movie[]; // Allow both types
+    data: (CombinedMovieData | Movie)[]; // Allow both types
     headers: string[];
     countries: Country[];
     onCountryChange: (rowIndex: number, newCountryId: number | undefined) => void;
@@ -12,7 +12,7 @@ interface Props {
 }
 
 const TableBody: React.FC<Props> = ({ data, headers, countries, onCountryChange, isAssociated }) => {
-    console.log('TableBody.tsx - onCheckboxChange:'); // Mover console.log aquí
+    // console.log('TableBody.tsx - onCheckboxChange:'); // Mover console.log aquí
     return (
         <tbody className="bg-white divide-y divide-gray-200">
             {data.map((row, rowIndex) => (

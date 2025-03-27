@@ -2,7 +2,8 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import { API_BASE_URL } from '../../utils/apiConfig';
 
-interface MovieAssociationState {
+// Exportar la interfaz MovieAssociationState
+export interface MovieAssociationState {
     associations: { [movieId: number]: boolean };
     status: 'idle' | 'loading' | 'succeeded' | 'failed';
     error: string | null;

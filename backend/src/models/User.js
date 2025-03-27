@@ -1,7 +1,7 @@
 // src/models/User.js
 const { DataTypes } = require('sequelize');
 const { sequelize } = require('../config/database');
-// const UserMovie = require('./UserMovie'); // Remove this line
+const bcrypt = require('bcrypt');
 
 const User = sequelize.define('User', {
     // ... (rest of your User model definition)
@@ -64,8 +64,23 @@ const User = sequelize.define('User', {
     // Puedes agregar más opciones según tus necesidades
 });
 
-// Remove the association definitions from here
-// User.hasMany(UserMovie, { foreignKey: 'userId' });
-// UserMovie.belongsTo(User, { foreignKey: 'userId' });
+// Método para comparar contraseñas
+User.prototype.comparePassword = async function (password) {
+    return await bcrypt.compare(password, this.password);
+};
+
+// Hash de la contraseña antes de guardar
+User.beforeCreate(async (user) => {
+    const salt = await bcrypt.genSalt(10);
+    user.password = await bcrypt.hash(user.password, salt);
+});
+
+// Hash de la contraseña antes de actualizar
+User.beforeUpdate(async (user) => {
+    if (user.changed('password')) {
+        const salt = await bcrypt.genSalt(10);
+        user.password = await bcrypt.hash(user.password, salt);
+    }
+});
 
 module.exports = User;

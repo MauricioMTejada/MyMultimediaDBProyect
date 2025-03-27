@@ -13,6 +13,18 @@ const getUserMoviesMiddleware = async (req, res) => {
     }
 };
 
+const getUserMoviesDataMiddleware = async (req, res) => {
+    const { userId } = req.params;
+    try {
+        const userMovies = await userController.getUserMoviesData(db.UserMovie, userId);
+        res.status(200).json(userMovies);
+    } catch (error) {
+        console.error('Error en getUserMoviesDataMiddleware:', error);
+        res.status(500).json({ error: error.message });
+    }
+};
+
 module.exports = {
-    getUserMoviesMiddleware
+    getUserMoviesMiddleware,
+    getUserMoviesDataMiddleware
 };
