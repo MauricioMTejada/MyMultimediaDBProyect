@@ -1,0 +1,59 @@
+/* frontend/src/components/Navbar/Navbar.css */
+.navbar {
+    background-color: #3b82f6; /* Azul */
+    color: white;
+    padding: 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.navbar-brand {
+    display: flex;
+    align-items: center;
+}
+
+.navbar-logo {
+    height: 40px;
+    margin-right: 1rem;
+}
+
+.navbar-title {
+    margin: 0;
+}
+
+.navbar-links {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    gap: 1rem;
+}
+
+.navbar-link {
+    color: white;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.navbar-link:hover {
+    text-decoration: underline;
+}
+
+.navbar-user-id {
+    margin-right: 1rem;
+}
+
+.navbar-logout {
+    background-color: transparent;
+    border: none;
+    color: white;
+    cursor: pointer;
+    font-size: 1rem;
+    padding: 0;
+    transition: color 0.3s ease;
+}
+
+.navbar-logout:hover {
+    text-decoration: underline;
+}
