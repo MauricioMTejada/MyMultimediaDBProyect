@@ -1,6 +1,6 @@
 // src/components/HomePage.tsx
 import React from 'react';
-import MovieTable from './movies/MovieTable';
+import MovieTable from './MovieTable';
 
 const HomePage: React.FC = () => {
     return (

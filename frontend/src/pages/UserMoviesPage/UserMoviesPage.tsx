@@ -1,10 +1,10 @@
-// src/components/movies/UserMoviesPage.tsx
+// src/pages/UserMoviesPage/UserMoviesPage.tsx
 import React, { useState, useEffect } from 'react';
-import Table from '../Table/Table';
-import { API_BASE_URL } from '../../utils/apiConfig';
+import Table from '../../components/Table/Table';
 import { CombinedMovieData, Country } from '../../types/types';
 import { useAppDispatch, useAppSelector } from '../../redux/hooks';
 import { setInitialWatchedStatus } from '../../redux/slices/userMovieSlice';
+import { fetchUserMovies, fetchCountries } from '../../services/userMovieService';
 
 const UserMoviesPage: React.FC = () => {
     const [combinedData, setCombinedData] = useState<CombinedMovieData[]>([]);
@@ -19,26 +19,22 @@ const UserMoviesPage: React.FC = () => {
             setIsLoading(true);
             setError(null);
             try {
-                const response = await fetch(`${API_BASE_URL}/users/${userId}/movies`); // Ruta corregida
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                const data: CombinedMovieData[] = await response.json();
-                setCombinedData(data);
+                if (userId) { // Comprobar si userId es null
+                    const data: CombinedMovieData[] = await fetchUserMovies(userId);
+                    setCombinedData(data);
 
-                // Inicializar el estado de watchedStatus en Redux
-                const initialWatchedStatus: { [userMovieId: number]: string } = {};
-                data.forEach(userMovie => {
-                    initialWatchedStatus[userMovie.userMovieId] = userMovie.watched;
-                });
-                dispatch(setInitialWatchedStatus(initialWatchedStatus));
+                    // Inicializar el estado de watchedStatus en Redux
+                    const initialWatchedStatus: { [userMovieId: number]: string } = {};
+                    data.forEach(userMovie => {
+                        initialWatchedStatus[userMovie.userMovieId] = userMovie.watched;
+                    });
+                    dispatch(setInitialWatchedStatus(initialWatchedStatus));
+                } else {
+                    setCombinedData([]); // Si no hay userId, no hay datos
+                }
 
                 // Fetch de los paises
-                const countriesResponse = await fetch(`${API_BASE_URL}/countries`);
-                if (!countriesResponse.ok) {
-                    throw new Error(`HTTP error! status: ${countriesResponse.status}`);
-                }
-                const countriesData: Country[] = await countriesResponse.json();
+                const countriesData: Country[] = await fetchCountries();
                 setCountries(countriesData);
 
             } catch (err: any) {

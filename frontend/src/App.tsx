@@ -1,25 +1,25 @@
 // frontend/src/App.tsx
 import { useEffect } from 'react';
 import { Routes, Route } from 'react-router-dom';
-import UserMoviesPage from './components/movies/UserMoviesPage';
-import Login from './components/Login';
+import LoginPages from './pages/Auth/LoginPage';
 import { useAppDispatch } from './redux/hooks';
-import { checkLoginStatusStart, checkLoginStatusSuccess } from './redux/slices/authSlice';
-import ProtectedRoute from './components/ProtectedRoute';
-import Register from './components/Register';
+import { checkLoginStatusStart, checkLoginStatusSuccess, logout } from './redux/slices/authSlice';
+import { ProtectedRoutes } from './routes';
+import RegisterPage from './pages/Auth/RegisterPage';
 import Navbar from './components/NavBar';
-import { HomePage, SeriesPage } from './pages';
+import { HomePage, SeriesPage, UserMoviesPage, UploadMoviesPage } from './pages';
+import { getJwtFromLocalStorage } from './services/authService';
 
 function App() {
     const dispatch = useAppDispatch();
 
     useEffect(() => {
         dispatch(checkLoginStatusStart());
-        const storedUserId = localStorage.getItem('userId');
-        if (storedUserId) {
-            dispatch(checkLoginStatusSuccess(parseInt(storedUserId)));
+        const token = getJwtFromLocalStorage();
+        if (token) {
+            dispatch(checkLoginStatusSuccess(token));
         } else {
-            dispatch(checkLoginStatusSuccess(null));
+            dispatch(logout());
         }
     }, [dispatch]);
 
@@ -27,6 +27,7 @@ function App() {
         { label: 'Home', to: '/' },
         { label: 'Películas', to: '/movies' },
         { label: 'Series', to: '/series' },
+        { label: 'Subir Película', to: '/uploadmovie' },
     ];
 
     return (
@@ -34,15 +35,16 @@ function App() {
             <Navbar links={navLinks} title="MyMultimediaDB" />
             <Routes>
                 <Route path="/" element={<HomePage />} />
-                <Route path="/login" element={<Login />} />
-                <Route path="/register" element={<Register />} />
+                <Route path="/login" element={<LoginPages />} />
+                <Route path="/register" element={<RegisterPage />} />
                 <Route path="/series" element={<SeriesPage />} />
+                <Route path="/uploadmovie" element={<UploadMoviesPage />} />
                 <Route
                     path="/movies"
                     element={
-                        <ProtectedRoute>
+                        <ProtectedRoutes>
                             <UserMoviesPage />
-                        </ProtectedRoute>
+                        </ProtectedRoutes>
                     }
                 />
             </Routes>

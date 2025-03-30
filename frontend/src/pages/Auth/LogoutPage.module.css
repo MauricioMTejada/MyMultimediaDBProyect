@@ -1,0 +1,14 @@
+/* LogoutPage.module.css */
+.button {
+  background-color: transparent; /* Fondo inicial transparente */
+  border: none; /* Sin bordes */
+  color: #ef4444; /* Texto rojo */
+  font-weight: 700; /* Negrita */
+  cursor: pointer; /* Cambia el cursor a pointer */
+  text-decoration: none; /* Elimina subrayado */
+}
+
+.button:hover {
+  background-color: #ef4444; /* Fondo rojo en hover */
+  color: #ffffff; /* Texto blanco en hover */
+}

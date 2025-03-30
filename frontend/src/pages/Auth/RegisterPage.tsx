@@ -1,49 +1,46 @@
-// frontend/src/components/Register.tsx
+// frontend/src/pages/Auth/RegisterPage.tsx
 import React, { useState } from 'react';
-import { useAppDispatch } from '../redux/hooks';
-import { registerUser } from '../services/authService';
-import { registerFailure, registerStart, registerSuccess } from '../redux/slices/authSlice';
-import { useNavigate } from 'react-router-dom';
+import { useAppDispatch } from '../../redux/hooks';
+import { registerUser } from '../../services/authService';
+import { registerFailure, registerStart, registerSuccess } from '../../redux/slices/authSlice';
+import { useNavigate, Link } from 'react-router-dom';
+import styles from './RegisterPage.module.css';
 
-interface RegisterUserData {
-    username: string;
-    email: string;
-    password: string;
-    firstName: string;
-    lastName: string;
-}
-
-const Register: React.FC = () => {
+const RegisterPage: React.FC = () => {
     const [username, setUsername] = useState('');
     const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
     const [firstName, setFirstName] = useState('');
     const [lastName, setLastName] = useState('');
+    const [password, setPassword] = useState('');
+    const [error, setError] = useState<string | null>(null);
     const dispatch = useAppDispatch();
     const navigate = useNavigate();
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         dispatch(registerStart());
+        setError(null);
         try {
-            const userData: RegisterUserData = { username, email, password, firstName, lastName };
-            await registerUser(userData);
-            dispatch(registerSuccess());
-            navigate('/login'); // Redirigir a la página de login
+            const data = await registerUser({ username, email, password, firstName, lastName });
+            dispatch(registerSuccess({ token: data.token, userId: data.userId }));
+            localStorage.setItem('token', data.token);
+            localStorage.setItem('userId', data.userId.toString());
+            navigate('/');
         } catch (error: any) {
             dispatch(registerFailure(error.message));
+            setError(error.message);
         }
     };
 
     return (
-        <div className="flex justify-center items-center h-screen">
-            <form onSubmit={handleSubmit} className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
+        <div className={styles.container}>
+            <form onSubmit={handleSubmit} className={styles.form}>
                 <div className="mb-4">
-                    <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="username">
+                    <label className={styles.label} htmlFor="username">
                         Usuario
                     </label>
                     <input
-                        className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                        className={styles.input}
                         id="username"
                         type="text"
                         placeholder="Usuario"
@@ -52,11 +49,11 @@ const Register: React.FC = () => {
                     />
                 </div>
                 <div className="mb-4">
-                    <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="email">
+                    <label className={styles.label} htmlFor="email">
                         Email
                     </label>
                     <input
-                        className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                        className={styles.input}
                         id="email"
                         type="email"
                         placeholder="Email"
@@ -65,11 +62,11 @@ const Register: React.FC = () => {
                     />
                 </div>
                 <div className="mb-4">
-                    <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="password">
+                    <label className={styles.label} htmlFor="password">
                         Contraseña
                     </label>
                     <input
-                        className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                        className={styles.input}
                         id="password"
                         type="password"
                         placeholder="Contraseña"
@@ -78,11 +75,11 @@ const Register: React.FC = () => {
                     />
                 </div>
                 <div className="mb-4">
-                    <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="firstName">
+                    <label className={styles.label} htmlFor="firstName">
                         Nombre
                     </label>
                     <input
-                        className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                        className={styles.input}
                         id="firstName"
                         type="text"
                         placeholder="Nombre"
@@ -91,11 +88,11 @@ const Register: React.FC = () => {
                     />
                 </div>
                 <div className="mb-4">
-                    <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="lastName">
+                    <label className={styles.label} htmlFor="lastName">
                         Apellido
                     </label>
                     <input
-                        className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                        className={styles.input}
                         id="lastName"
                         type="text"
                         placeholder="Apellido"
@@ -103,9 +100,9 @@ const Register: React.FC = () => {
                         onChange={(e) => setLastName(e.target.value)}
                     />
                 </div>
-                <div className="flex items-center justify-between">
+                <div className={styles.buttonContainer}>
                     <button
-                        className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+                        className={styles.button}
                         type="submit"
                     >
                         Registrarse
@@ -116,4 +113,4 @@ const Register: React.FC = () => {
     );
 };
 
-export default Register;
+export default RegisterPage;

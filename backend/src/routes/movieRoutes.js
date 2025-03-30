@@ -10,6 +10,9 @@ router.get('/:movieId', getMovieByIdMiddleware, getMovieById); // Obtener una pe
 router.post('/', createMovieMiddleware, createMovie); // Crear una película
 router.put('/:movieId', updateMovieMiddleware, updateMovie); // Actualizar una película
 router.delete('/:movieId', deleteMovieMiddleware, deleteMovie); // Eliminar una película
-router.post('/upload', uploadMoviesToDatabaseMiddleware, uploadMoviesToDatabase); // Subir películas a la base de datos
+router.post('/upload', uploadMoviesToDatabaseMiddleware, (req, res, next) => {
+//   console.log('Datos recibidos en /upload:', req.body); // Agregamos el console.log aquí
+  next(); // Llamamos a next() para que se ejecute el siguiente middleware o controlador
+}, uploadMoviesToDatabase); // Subir películas a la base de datos
 
 module.exports = router;

@@ -1,0 +1,1 @@
+export { default as UploadMoviesPage } from './UploadMoviesPage';

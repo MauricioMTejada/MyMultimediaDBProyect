@@ -1,7 +1,7 @@
 // src/slices/countriesSlice.ts
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { Country } from '../../types/types'; //Importamos la interface de types
-import { API_BASE_URL } from '../../utils/apiConfig';//Importamos la constante
+import { api } from '../../utils/apiConfig';//Importamos la constante
 
 // Exportar la interfaz CountriesState
 export interface CountriesState {
@@ -20,12 +20,13 @@ const initialState: CountriesState = {
 export const fetchCountries = createAsyncThunk<Country[], void>(
   'countries/fetchCountries',
   async () => {
-    const response = await fetch(`${API_BASE_URL}/countries/`); // Usar la constante
-    if (!response.ok) {
-      throw new Error('Error al obtener los países');
+    try {
+      const response = await api.get<Country[]>('/countries'); // Use api.get with type
+      return response.data; // Return the data from the response
+    } catch (error: any) {
+      // Handle errors properly
+      throw new Error(error.response?.data?.message || 'Error al obtener los países');
     }
-    const data: Country[] = await response.json();
-    return data;
   }
 );
 

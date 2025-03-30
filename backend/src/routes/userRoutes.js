@@ -5,7 +5,7 @@ const { createUserMovie, deleteUserMovie, getIsMovieAssociated, getUserMovies } 
 
 // Rutas para las asociaciones UserMovie
 router.post('/:userId/movies/:movieId', (req, res, next) => {
-    console.log('Petición POST a /users/:userId/movies/:movieId recibida:', req.params);
+    // console.log('Petición POST a /users/:userId/movies/:movieId recibida:', req.params);
     next();
 }, createUserMovie); // Crear asociación
 router.delete('/:userId/movies/:movieId', deleteUserMovie); // Eliminar asociación

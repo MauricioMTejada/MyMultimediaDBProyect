@@ -1,50 +1,43 @@
 // frontend/src/services/authService.ts
-import { API_BASE_URL } from '../utils/apiConfig';
+import { createAsyncThunk } from '@reduxjs/toolkit';
+import { LoginCredentials, UserData } from '../types/types';
+import { api } from '../utils/apiConfig';
 
-interface LoginCredentials {
-    username: string;
-    password: string;
-}
-
-interface RegisterUserData {
-    username: string;
-    email: string;
-    password: string;
-    firstName: string;
-    lastName: string;
-}
-
-export const loginUser = async (credentials: LoginCredentials) => {
-    const response = await fetch(`${API_BASE_URL}/auth/login`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(credentials),
-    });
-
-    if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Error en el login');
-    }
-
-    const data = await response.json();
-    return data; // { token, userId }
+export const getJwtFromLocalStorage = (): string | null => {
+    return localStorage.getItem('token');
 };
 
-export const registerUser = async (userData: RegisterUserData) => {
-    const response = await fetch(`${API_BASE_URL}/auth/register`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(userData),
-    });
-
-    if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Error en el registro');
+export const loginUser = async (credentials: LoginCredentials): Promise<UserData> => {
+    try {
+        const response = await api.post('/auth/login', credentials);
+        return response.data;
+    } catch (error: any) {
+        throw new Error(error.response?.data?.message || 'Error al iniciar sesión');
     }
-
-    return await response.json();
 };
+
+export const registerUser = async (userData: any): Promise<any> => {
+    try {
+        const response = await api.post('/auth/register', userData);
+        return response.data;
+    } catch (error: any) {
+        throw new Error(error.response?.data?.message || 'Error al registrar usuario');
+    }
+};
+
+export const checkLoginStatus = createAsyncThunk('auth/checkLoginStatus', async (_, { rejectWithValue }) => {
+    const token = getJwtFromLocalStorage();
+    if (!token) {
+        return rejectWithValue('No hay token');
+    }
+    try {
+        const response = await api.get('/auth/check', {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        });
+        return response.data;
+    } catch (error: any) {
+        return rejectWithValue(error.response?.data?.message || 'Error al verificar el estado de inicio de sesión');
+    }
+});

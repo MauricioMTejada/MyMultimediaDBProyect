@@ -1,7 +1,7 @@
 // frontend/src/redux/hooks.ts
 import { TypedUseSelectorHook, useDispatch, useSelector } from 'react-redux';
 import type { AppDispatch, RootState } from './store';
-import { API_BASE_URL } from '../utils/apiConfig';
+import { api } from '../utils/apiConfig';
 
 // Use throughout your app instead of plain `useDispatch` and `useSelector`
 export const useAppDispatch: () => AppDispatch = useDispatch;
@@ -15,7 +15,7 @@ export const fetchWithToken = async (url: string, options: RequestInit = {}) => 
         'Authorization': token ? `Bearer ${token}` : '',
     };
 
-    const response = await fetch(`${API_BASE_URL}${url}`, {
+    const response = await fetch(`${api}${url}`, {
         ...options,
         headers,
     });

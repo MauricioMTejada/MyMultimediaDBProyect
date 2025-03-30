@@ -77,8 +77,9 @@ const deleteMovie = async (req, res) => {
 
 const uploadMoviesToDatabase = async (req, res) => {
     try {
-        const moviesData = req.body;
-        const moviesCreated = await Movie.bulkCreate(moviesData);
+        const moviesToCreate = req.body; // Los datos ya están mapeados por el middleware
+        // console.log("Datos recibidos en uploadMoviesToDatabase antes de bulkCreate:", moviesToCreate); // Agregamos el console.log aquí
+        const moviesCreated = await Movie.bulkCreate(moviesToCreate);
         res.status(201).json(moviesCreated);
     } catch (error) {
         console.error('Error al subir las películas a la base de datos:', error);
@@ -88,10 +89,10 @@ const uploadMoviesToDatabase = async (req, res) => {
 
 const createUserMovie = async (req, res) => {
     const { userId, movieId } = req.params;
-    console.log('createUserMovie - userId:', userId, 'movieId:', movieId); // Loguear userId y movieId
+    // console.log('createUserMovie - userId:', userId, 'movieId:', movieId); // Loguear userId y movieId
     try {
         const userMovie = await UserMovie.create({ userId, movieId });
-        console.log('createUserMovie - Asociación creada:', userMovie); // Loguear la asociación creada
+        // console.log('createUserMovie - Asociación creada:', userMovie); // Loguear la asociación creada
         res.status(201).json({ message: 'Asociación creada correctamente', userMovie });
     } catch (error) {
         console.error('createUserMovie - Error al crear la asociación:', error); // Loguear el error

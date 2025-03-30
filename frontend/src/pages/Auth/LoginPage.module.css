@@ -1,0 +1,97 @@
+/* LoginPage.module.css */
+.container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+.form {
+  background-color: #f3f4f6; /* Reemplazo de bg-gray-100 */
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  border-radius: 0.375rem;
+  padding: 1.5rem 2rem;
+  margin-bottom: 1rem;
+}
+
+.label {
+  display: block;
+  color: #4b5563; /* text-gray-700 */
+  font-size: 0.875rem; /* text-sm */
+  font-weight: 700; /* font-bold */
+  margin-bottom: 0.5rem; /* mb-2 */
+}
+
+.input {
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  appearance: none;
+  border: 1px solid #d1d5db; /* border */
+  border-radius: 0.375rem; /* rounded */
+  width: 100%; /* w-full */
+  padding: 0.5rem 0.75rem; /* py-2 px-3 */
+  color: #4b5563; /* text-gray-700 */
+  line-height: 1.25rem; /* leading-tight */
+  outline: none; /* focus:outline-none */
+}
+
+.input:focus {
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.5); /* focus:shadow-outline */
+}
+
+.inputPassword {
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  appearance: none;
+  border: 1px solid #d1d5db; /* border */
+  border-radius: 0.375rem; /* rounded */
+  width: 100%; /* w-full */
+  padding: 0.5rem 0.75rem; /* py-2 px-3 */
+  color: #4b5563; /* text-gray-700 */
+  margin-bottom: 0.75rem; /* mb-3 */
+  line-height: 1.25rem; /* leading-tight */
+  outline: none; /* focus:outline-none */
+}
+
+.inputPassword:focus {
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.5); /* focus:shadow-outline */
+}
+
+.error {
+  color: #ef4444; /* text-red-500 */
+  margin-bottom: 1rem; /* mb-4 */
+}
+
+.buttonContainer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.button {
+  background-color: #3b82f6; /* bg-blue-500 */
+  color: #ffffff; /* text-white */
+  font-weight: 700; /* font-bold */
+  padding: 0.5rem 1rem; /* py-2 px-4 */
+  border-radius: 0.375rem; /* rounded */
+  outline: none; /* focus:outline-none */
+}
+
+.button:hover {
+  background-color: #2563eb; /* hover:bg-blue-700 */
+}
+
+.button:focus {
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.5); /* focus:shadow-outline */
+}
+
+.registerLink {
+  display: inline-block;
+  vertical-align: baseline; /* align-baseline */
+  font-weight: 700; /* font-bold */
+  font-size: 0.875rem; /* text-sm */
+  color: #3b82f6; /* text-blue-500 */
+  text-decoration: none;
+}
+
+.registerLink:hover {
+  color: #1d4ed8; /* hover:text-blue-800 */
+}

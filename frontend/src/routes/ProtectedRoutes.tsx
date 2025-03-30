@@ -7,7 +7,7 @@ interface ProtectedRouteProps {
     children: React.ReactNode;
 }
 
-const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
+const ProtectedRoutes: React.FC<ProtectedRouteProps> = ({ children }) => {
     const isLoggedIn = useAppSelector((state) => state.auth.isLoggedIn);
 
     if (!isLoggedIn) {
@@ -17,4 +17,4 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
     return <>{children}</>;
 };
 
-export default ProtectedRoute;
+export default ProtectedRoutes;

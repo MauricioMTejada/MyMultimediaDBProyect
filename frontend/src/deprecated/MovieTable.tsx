@@ -1,10 +1,10 @@
 // src/components/movies/MovieTable.tsx
 import React, { useState, useEffect } from 'react';
-import Table from '../Table/Table';
-import { API_BASE_URL } from '../../utils/apiConfig';
-import { Movie, Country } from '../../types/types';
-import { useAppDispatch } from '../../redux/hooks';
-import { fetchInitialAssociations } from '../../redux/slices/movieAssociationSlice';
+import Table from '../components/Table/Table';
+import { api } from '../utils/apiConfig';
+import { Movie, Country } from '../types/types';
+import { useAppDispatch } from '../redux/hooks';
+import { fetchInitialAssociations } from '../redux/slices/movieAssociationSlice';
 
 const MovieTable: React.FC = () => {
     const [movies, setMovies] = useState<Movie[]>([]);
@@ -19,7 +19,7 @@ const MovieTable: React.FC = () => {
             setIsLoading(true);
             setError(null);
             try {
-                const moviesResponse = await fetch(`${API_BASE_URL}/movies`);
+                const moviesResponse = await fetch(`${api}/movies`);
                 if (!moviesResponse.ok) {
                     throw new Error(`HTTP error! status: ${moviesResponse.status}`);
                 }
@@ -27,7 +27,7 @@ const MovieTable: React.FC = () => {
                 setMovies(moviesData);
 
                 // Fetch de los paises
-                const countriesResponse = await fetch(`${API_BASE_URL}/countries`);
+                const countriesResponse = await fetch(`${api}/countries`);
                 if (!countriesResponse.ok) {
                     throw new Error(`HTTP error! status: ${countriesResponse.status}`);
                 }

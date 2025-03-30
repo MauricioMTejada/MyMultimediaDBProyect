@@ -1,18 +1,18 @@
-// src/components/UploadMovies.tsx
+// src/pages/UploadMovies/UploadMoviesPage.tsx
 import React, { useState, useEffect } from 'react';
 import Papa, { ParseResult } from 'papaparse';
-import TableUpload from './Table/TableUpload';
-import { Movie } from '../types/types'; //Importamos la interface de types
-import { API_BASE_URL } from '../utils/apiConfig'; // Importamos la constante
-import { useAppDispatch, useAppSelector } from '../hooks.ts'; // Importa los hooks personalizados
-import { fetchCountries } from '../redux/slices/countriesSlice.ts'; // Importa el thunk
+import TableUpload from '../../components/Table/TableUpload';
+import { Movie } from '../../types/types'; //Importamos la interface de types
+import { useAppDispatch, useAppSelector } from '../../hooks'; // Importa los hooks personalizados
+import { fetchCountries } from '../../redux/slices/countriesSlice'; // Importa el thunk
+import { uploadMovies } from '../../services/uploadMovieService';
 
 //Creamos una nueva interface para el estado interno, para guardar tanto la pelicula, como el pais del csv
 interface MovieWithCSVCountry extends Movie {
     csvCountry: string; // Propiedad para guardar el país del CSV
 }
 
-const UploadMovies: React.FC = () => {
+const UploadMoviesPage: React.FC = () => {
     const [file, setFile] = useState<File | null>(null);
     //Modificamos el estado, para que ahora sea de tipo MovieWithCSVCountry
     const [data, setData] = useState<MovieWithCSVCountry[]>([]);
@@ -78,30 +78,19 @@ const UploadMovies: React.FC = () => {
         }
 
         // Eliminar csvCountry antes de enviar los datos
-        const dataToSend = data.map(({ csvCountry, ...movie }) => movie); // <-- Modificación aquí
-        console.log("Datos a enviar desde UploadMovies.tsx:", dataToSend); // <-- Nuevo console.log
-
+        const dataToSend = data.map(({ csvCountry, ...movie }) => movie);
+        console.log("Datos a enviar desde UploadMovies.tsx:", dataToSend);
 
         try {
-        const response = await fetch(`${API_BASE_URL}/movies/upload-json`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(dataToSend), // <-- Enviamos los datos limpios
-        });
-
-            if (response.ok) {
-                setMessage('Datos cargados correctamente.');
-                setData([]);
-                setFile(null);
-            } else {
-                setMessage(`Error al cargar los datos: ${response.statusText}`);
-            }
+            await uploadMovies(dataToSend);
+            setMessage('Datos cargados correctamente.');
+            setData([]);
+            setFile(null);
         } catch (error: any) {
-            setMessage(`Error de conexión: ${error.message}`);
+            setMessage(error.message);
         }
     };
+
     // Si hay error, se muestra un mensaje.
     if (error) {
         return <p>{error}</p>;
@@ -141,4 +130,4 @@ const UploadMovies: React.FC = () => {
     );
 };
 
-export default UploadMovies;
+export default UploadMoviesPage;

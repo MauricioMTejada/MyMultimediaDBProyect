@@ -1,7 +1,7 @@
 // frontend/src/components/RandomCountries.tsx
 import React, { useState, useEffect } from 'react';
 import './RandomCountries.css';
-import { API_BASE_URL } from '../utils/apiConfig'; // Importar la constante
+import { api } from '../utils/apiConfig'; // Importar la constante
 
 interface Country {
     id: number;
@@ -17,7 +17,7 @@ const RandomCountries: React.FC = () => {
     useEffect(() => {
         const fetchCountries = async () => {
             try {
-                const response = await fetch(`${API_BASE_URL}/countries/random`); // Usar la constante
+                const response = await fetch(`${api}/countries/random`); // Usar la constante
                 if (!response.ok) {
                     //manejo del error 404
                     if (response.status === 404) {

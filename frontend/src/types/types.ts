@@ -46,3 +46,15 @@ export interface UserMovie {
     recommendationSource: string | null;
     selectOriginalTitle: boolean;
 }
+
+export interface LoginCredentials {
+    username: string;
+    password: string;
+}
+
+export interface UserData {
+    token: string;
+    userId: number;
+    // Add other user data properties if needed
+    email: string;
+}

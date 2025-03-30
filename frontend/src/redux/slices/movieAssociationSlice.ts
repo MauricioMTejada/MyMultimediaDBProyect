@@ -1,6 +1,6 @@
 // src/redux/slices/movieAssociationSlice.ts
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
-import { API_BASE_URL } from '../../utils/apiConfig';
+import { api } from '../../utils/apiConfig';
 
 // Exportar la interfaz MovieAssociationState
 export interface MovieAssociationState {
@@ -18,42 +18,35 @@ const initialState: MovieAssociationState = {
 // Thunk para crear o eliminar la asociación
 export const toggleMovieAssociation = createAsyncThunk(
     'movieAssociation/toggleMovieAssociation',
-    async ({ userId, movieId, checked }: { userId: number; movieId: number; checked: boolean }) => {
-        const method = checked ? 'POST' : 'DELETE';
-        const url = `${API_BASE_URL}/users/${userId}/movies/${movieId}`;
-        const headers = {
-            'Content-Type': 'application/json',
-        };
-        const body = checked ? JSON.stringify({ userId, movieId }) : undefined;
-
-        const response = await fetch(url, {
-            method,
-            headers,
-            body,
-        });
-
-        if (!response.ok) {
-            throw new Error(`Error al ${checked ? 'asociar' : 'desasociar'} la película. Status: ${response.status}`);
+    async ({ userId, movieId, checked }: { userId: number; movieId: number; checked: boolean }, { rejectWithValue }) => {
+        try {
+            if (checked) {
+                await api.post(`/users/${userId}/movies/${movieId}`, { userId, movieId });
+            } else {
+                await api.delete(`/users/${userId}/movies/${movieId}`);
+            }
+            return { movieId, checked };
+        } catch (error: any) {
+            return rejectWithValue(error.response?.data || `Error al ${checked ? 'asociar' : 'desasociar'} la película. Status: ${error.response?.status}`);
         }
-
-        return { movieId, checked };
     }
 );
 
 // Thunk para obtener las asociaciones iniciales
 export const fetchInitialAssociations = createAsyncThunk(
     'movieAssociation/fetchInitialAssociations',
-    async (userId: number) => {
-        const response = await fetch(`${API_BASE_URL}/users/${userId}/movies`);
-        if (!response.ok) {
-            throw new Error('Error al obtener las asociaciones iniciales');
+    async (userId: number, { rejectWithValue }) => {
+        try {
+            const response = await api.get(`/users/${userId}/movies`);
+            const data = response.data;
+            const initialAssociations: { [movieId: number]: boolean } = {};
+            data.forEach((movie: any) => {
+                initialAssociations[movie.movieId] = true;
+            });
+            return initialAssociations;
+        } catch (error: any) {
+            return rejectWithValue(error.response?.data || 'Error al obtener las asociaciones iniciales');
         }
-        const data = await response.json();
-        const initialAssociations: { [movieId: number]: boolean } = {};
-        data.forEach((movie: any) => {
-            initialAssociations[movie.movieId] = true;
-        });
-        return initialAssociations;
     }
 );
 
@@ -77,7 +70,7 @@ const movieAssociationSlice = createSlice({
             })
             .addCase(toggleMovieAssociation.rejected, (state, action) => {
                 state.status = 'failed';
-                state.error = action.error.message || 'Error al actualizar la asociación';
+                state.error = action.payload as string || 'Error al actualizar la asociación';
             })
             .addCase(fetchInitialAssociations.pending, (state) => {
                 state.status = 'loading';
@@ -88,7 +81,7 @@ const movieAssociationSlice = createSlice({
             })
             .addCase(fetchInitialAssociations.rejected, (state, action) => {
                 state.status = 'failed';
-                state.error = action.error.message || 'Error al obtener las asociaciones iniciales';
+                state.error = action.payload as string || 'Error al obtener las asociaciones iniciales';
             });
     },
 });

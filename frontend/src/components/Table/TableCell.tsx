@@ -4,8 +4,8 @@ import { Country, CombinedMovieData, Movie } from '../../types/types';
 import { useAppDispatch, useAppSelector } from '../../redux/hooks';
 import { toggleMovieAssociation, setAssociation } from '../../redux/slices/movieAssociationSlice';
 import { truncateText } from '../../utils/utils';
-import { API_BASE_URL } from '../../utils/apiConfig';
 import { setWatchedStatusStart, setWatchedStatusSuccess, setWatchedStatusFailure } from '../../redux/slices/userMovieSlice';
+import { checkMovieAssociation } from '../../services/movieAssociationService';
 
 interface Props {
     header: string;
@@ -29,11 +29,7 @@ const TableCell: React.FC<Props> = ({ header, row, rowIndex, colIndex, countries
         const checkAssociation = async () => {
             if (!isLoggedIn || !userId || 'userMovieId' in row) return; // No hacer nada si no está logueado o si es CombinedMovieData
             try {
-                const response = await fetch(`${API_BASE_URL}/users/${userId}/movies/${row.id}`);
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                const data = await response.json();
+                const data = await checkMovieAssociation(userId, row.id);
                 dispatch(setAssociation({ movieId: row.id, checked: data.isAssociated }));
             } catch (error) {
                 console.error('Error checking association:', error);
