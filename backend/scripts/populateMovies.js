@@ -41,7 +41,7 @@ async function populateMovies() {
                             image: row.Imagen,
                         });
                         //imprimir pk de la pelicula creada
-                        console.log(`Película creada con ID: ${movie.id}`); // <-- Imprimir el ID
+                        // console.log(`Película creada con ID: ${movie.id}`); // <-- Imprimir el ID
 
                         //6. agregar generos
                         const genres = row.Género.split(',').map(genre => genre.trim());
@@ -49,7 +49,7 @@ async function populateMovies() {
                                 let genre = await Genre.findOne({ where: { name: genreName } });
                                 if (!genre) {
                                     genre = await Genre.create({ name: genreName });
-                                    console.log(`Genero creado con id: ${genre.id}`);
+                                    // console.log(`Genero creado con id: ${genre.id}`);
                                 }
                                 await MovieGenre.create({ MovieId: movie.id, GenreId: genre.id });
                             }

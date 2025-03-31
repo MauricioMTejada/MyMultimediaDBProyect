@@ -2,15 +2,12 @@
 const { Movie, UserMovie } = require('../models/associations'); // Importar los modelos
 
 const getAllMovies = async (req, res) => {
-    const userId = req.query.userId; // Obtener el userId de la query
     try {
         const movies = await Movie.findAll(); // Buscar todas las películas
 
         const moviesWithAssociation = await Promise.all(movies.map(async movie => {
-            const isAssociated = userId ? await UserMovie.findOne({ where: { userId, movieId: movie.id } }) : false;
             return {
                 ...movie.get({ plain: true }),
-                isAssociated: !!isAssociated
             };
         }));
 
@@ -88,11 +85,10 @@ const uploadMoviesToDatabase = async (req, res) => {
 };
 
 const createUserMovie = async (req, res) => {
-    const { userId, movieId } = req.params;
-    // console.log('createUserMovie - userId:', userId, 'movieId:', movieId); // Loguear userId y movieId
+    const { movieId } = req.params;
+    const userId = req.user.userId; // Obtener el userId del token
     try {
         const userMovie = await UserMovie.create({ userId, movieId });
-        // console.log('createUserMovie - Asociación creada:', userMovie); // Loguear la asociación creada
         res.status(201).json({ message: 'Asociación creada correctamente', userMovie });
     } catch (error) {
         console.error('createUserMovie - Error al crear la asociación:', error); // Loguear el error
@@ -101,7 +97,8 @@ const createUserMovie = async (req, res) => {
 };
 
 const deleteUserMovie = async (req, res) => {
-    const { userId, movieId } = req.params;
+    const { movieId } = req.params;
+    const userId = req.user.userId; // Obtener el userId del token
     try {
         const userMovie = await UserMovie.findOne({ where: { userId, movieId } });
         if (!userMovie) {
@@ -116,7 +113,8 @@ const deleteUserMovie = async (req, res) => {
 };
 
 const getIsMovieAssociated = async (req, res) => {
-    const { userId, movieId } = req.params;
+    const { movieId } = req.params;
+    const userId = req.user.userId; // Obtener el userId del token
     try {
         const userMovie = await UserMovie.findOne({ where: { userId, movieId } });
         res.json({ isAssociated: !!userMovie });
@@ -127,7 +125,7 @@ const getIsMovieAssociated = async (req, res) => {
 };
 
 const getUserMovies = async (req, res) => {
-    const { userId } = req.params;
+    const userId = req.user.userId; // Obtener el userId del token
     try {
         const userMovies = await UserMovie.findAll({
             where: { userId },
@@ -152,6 +150,24 @@ const getUserMovies = async (req, res) => {
         console.error('Error al obtener las películas asociadas al usuario:', error);
         res.status(500).json({ message: 'Error al obtener las películas asociadas al usuario' });
     }
+
+
+};
+
+const updateUserMovie = async (req, res) => {
+    const { userMovieId } = req.params;
+    const { watched } = req.body;
+    try {
+        const userMovie = await UserMovie.findByPk(userMovieId);
+        if (!userMovie) {
+            return res.status(404).json({ message: 'Asociación no encontrada' });
+        }
+        await userMovie.update({ watched });
+        res.json({ message: 'Estado de visto actualizado correctamente', userMovie });
+    } catch (error) {
+        console.error('Error al actualizar el estado de visto:', error);
+        res.status(500).json({ message: 'Error al actualizar el estado de visto' });
+    }
 };
 
 module.exports = {
@@ -164,5 +180,6 @@ module.exports = {
     createUserMovie,
     deleteUserMovie,
     getIsMovieAssociated,
-    getUserMovies
+    getUserMovies,
+    updateUserMovie
 };

@@ -6,11 +6,14 @@ const { User } = require('../models/associations'); // Importar User desde assoc
 const login = async (req, res) => {
     const { username, password } = req.body;
 
+    // console.log('authController.js - Datos recibidos en /login:', { username, password });
+
     try {
         // Buscar al usuario por nombre de usuario
         const user = await User.findOne({ where: { username } });
 
         if (!user) {
+            // console.log('authController.js - Usuario no encontrado');
             return res.status(401).json({ message: 'Credenciales inválidas' });
         }
 
@@ -18,13 +21,15 @@ const login = async (req, res) => {
         const isMatch = await user.comparePassword(password);
 
         if (!isMatch) {
+            // console.log('authController.js - Contraseña incorrecta');
             return res.status(401).json({ message: 'Credenciales inválidas' });
         }
 
         // Crear el token JWT
         const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET, { expiresIn: '1h' });
 
-        res.json({ token, userId: user.id });
+        // console.log('authController.js - Inicio de sesión exitoso:', { userId: user.id, token });
+        res.json({ token, userId: user.id }); // Devolvemos el token y el userId
     } catch (error) {
         console.error('Error en el login:', error);
         res.status(500).json({ message: 'Error en el servidor' });
@@ -55,12 +60,20 @@ const register = async (req, res) => {
             firstName,
             lastName,
         });
+        // Crear el token JWT
+        const token = jwt.sign({ userId: newUser.id }, process.env.JWT_SECRET, { expiresIn: '1h' });
 
-        res.status(201).json({ message: 'Usuario registrado correctamente', userId: newUser.id });
+        res.status(201).json({ message: 'Usuario registrado correctamente', token, userId: newUser.id }); // Devolvemos el token y el userId
     } catch (error) {
         console.error('Error en el registro:', error);
         res.status(500).json({ message: 'Error en el servidor' });
     }
 };
 
-module.exports = { login, register };
+// Función para verificar el estado del login
+const check = (req, res) => {
+    // Si llegamos aquí, el token es válido
+    res.json({ userId: req.user.userId, token: req.headers['authorization'].split(' ')[1] }); // Devolvemos el userId del usuario y el token
+};
+
+module.exports = { login, register, check };

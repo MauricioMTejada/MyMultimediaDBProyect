@@ -6,6 +6,7 @@ import { toggleMovieAssociation, setAssociation } from '../../redux/slices/movie
 import { truncateText } from '../../utils/utils';
 import { setWatchedStatusStart, setWatchedStatusSuccess, setWatchedStatusFailure } from '../../redux/slices/userMovieSlice';
 import { checkMovieAssociation } from '../../services/movieAssociationService';
+import { updateUserMovie } from '../../services/userMovieService'; // Importar la nueva función
 
 interface Props {
     header: string;
@@ -24,48 +25,50 @@ const TableCell: React.FC<Props> = ({ header, row, rowIndex, colIndex, countries
     const isChecked = useAppSelector((state) => state.movieAssociation.associations[row.id] || false);
     const watchedStatus = useAppSelector((state) => state.userMovie.watchedStatus[row.userMovieId]);
     const loading = useAppSelector((state) => state.userMovie.loading);
+    const token = useAppSelector((state) => state.auth.token); // Obtener el token de Redux
 
-    useEffect(() => {
-        const checkAssociation = async () => {
-            if (!isLoggedIn || !userId || 'userMovieId' in row) return; // No hacer nada si no está logueado o si es CombinedMovieData
-            try {
-                const data = await checkMovieAssociation(userId, row.id);
-                dispatch(setAssociation({ movieId: row.id, checked: data.isAssociated }));
-            } catch (error) {
-                console.error('Error checking association:', error);
-            }
-        };
-        if (isAssociated) {
-            checkAssociation();
-        }
-    }, [dispatch, isAssociated, row.id, isLoggedIn, userId]);
+    // useEffect(() => {
+    //     const checkAssociation = async (token: string) => {
+    //         if (!isLoggedIn || !userId || 'userMovieId' in row || !token) return; // No hacer nada si no está logueado o si es CombinedMovieData o no hay token
+    //         try {
+    //             const data = await checkMovieAssociation(row.id, token);
+    //             dispatch(setAssociation({ movieId: row.id, checked: data }));
+    //         } catch (error) {
+    //             console.error('Error checking association:', error);
+    //         }
+    //     };
+    //     if (isAssociated !== undefined) {
+    //         checkAssociation(token!);
+    //     }
+    // }, [dispatch, isAssociated, row.id, isLoggedIn, userId, token]); // Dependencia token
 
     const handleCheckboxChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const checked = event.target.checked;
-        console.log(`TableCell.tsx - onChange - row.id: ${row.id}, checked: ${checked}`);
+        // console.log(`TableCell.tsx - onChange - row.id: ${row.id}, checked: ${checked}`);
         if (userId) {
             dispatch(toggleMovieAssociation({ userId, movieId: row.id, checked }));
         }
     };
 
-    const handleWatchedChange = async (event: React.ChangeEvent<HTMLSelectElement>) => {
-        const newWatchedStatus = event.target.value;
-        const userMovieId = (row as CombinedMovieData).userMovieId; // Asegurar que row es CombinedMovieData
+    // const handleWatchedChange = async (event: React.ChangeEvent<HTMLSelectElement>) => {
+    //     const newWatchedStatus = event.target.value;
+    //     const userMovieId = (row as CombinedMovieData).userMovieId; // Asegurar que row es CombinedMovieData
 
-        dispatch(setWatchedStatusStart());
-        try {
-            // Aquí iría la llamada a la API para actualizar el estado en la base de datos
-            // Por ahora, solo actualizamos el estado en Redux
-            dispatch(setWatchedStatusSuccess({ userMovieId, watched: newWatchedStatus }));
-        } catch (error: any) {
-            dispatch(setWatchedStatusFailure(error.message || 'Error al actualizar el estado de visto'));
-        }
-    };
+    //     dispatch(setWatchedStatusStart());
+    //     try {
+    //         if(token){
+    //             await updateUserMovie(userMovieId, newWatchedStatus, token); // Llamada a la API
+    //             dispatch(setWatchedStatusSuccess({ userMovieId, watched: newWatchedStatus }));
+    //         }
+    //     } catch (error: any) {
+    //         dispatch(setWatchedStatusFailure(error.message || 'Error al actualizar el estado de visto'));
+    //     }
+    // };
 
     let cellValue: any;
     let cellContent: any;
 
-    if (header === 'image') {
+    /* if (header === 'image') {
         cellValue = row.image;
         cellContent = cellValue ? (
             <a href={cellValue} target="_blank" rel="noopener noreferrer">
@@ -140,7 +143,7 @@ const TableCell: React.FC<Props> = ({ header, row, rowIndex, colIndex, countries
                 <div><b>Origen de Recomendación:</b> {(row as CombinedMovieData).recommendationSource ? (row as CombinedMovieData).recommendationSource : "N/A"}</div>
             </div>
         );
-    } else if (header === 'Asociar' && isAssociated && !('userMovieId' in row)) {
+    } else if (header === 'Asociar' && isAssociated !== undefined && !('userMovieId' in row)) {
         cellContent = (
             <input
                 type="checkbox"
@@ -158,7 +161,9 @@ const TableCell: React.FC<Props> = ({ header, row, rowIndex, colIndex, countries
         <td key={`${rowIndex}-${colIndex}`} className="px-6 py-4 whitespace-nowrap">
             {cellContent}
         </td>
-    );
+    );*/
+
+    return <></>
 };
 
 export default TableCell;

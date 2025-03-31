@@ -11,7 +11,7 @@ const UserMoviesPage: React.FC = () => {
     const [isLoading, setIsLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
     const [countries, setCountries] = useState<Country[]>([]);
-    const userId = useAppSelector((state) => state.auth.userId); // Obtener el userId de Redux
+    const token = useAppSelector((state) => state.auth.token); // Obtener el token de Redux
     const dispatch = useAppDispatch();
 
     useEffect(() => {
@@ -19,8 +19,8 @@ const UserMoviesPage: React.FC = () => {
             setIsLoading(true);
             setError(null);
             try {
-                if (userId) { // Comprobar si userId es null
-                    const data: CombinedMovieData[] = await fetchUserMovies(userId);
+                if (token) { // Comprobar si hay token
+                    const data: CombinedMovieData[] = await fetchUserMovies(token); // Pasar el token a fetchUserMovies
                     setCombinedData(data);
 
                     // Inicializar el estado de watchedStatus en Redux
@@ -30,7 +30,7 @@ const UserMoviesPage: React.FC = () => {
                     });
                     dispatch(setInitialWatchedStatus(initialWatchedStatus));
                 } else {
-                    setCombinedData([]); // Si no hay userId, no hay datos
+                    setCombinedData([]); // Si no hay token, no hay datos
                 }
 
                 // Fetch de los paises
@@ -45,10 +45,10 @@ const UserMoviesPage: React.FC = () => {
         };
 
         fetchData();
-    }, [userId, dispatch]); // Dependencia userId
+    }, [token, dispatch]); // Dependencia token
 
     const handleCountryChange = (rowIndex: number, newCountryId: number | undefined) => {
-        console.log(`Cambiando el país de la fila ${rowIndex} a ${newCountryId}`);
+        // console.log(`Cambiando el país de la fila ${rowIndex} a ${newCountryId}`);
     };
 
     if (isLoading) {

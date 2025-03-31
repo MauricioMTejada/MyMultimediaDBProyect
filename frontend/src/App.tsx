@@ -3,23 +3,25 @@ import { useEffect } from 'react';
 import { Routes, Route } from 'react-router-dom';
 import LoginPages from './pages/Auth/LoginPage';
 import { useAppDispatch } from './redux/hooks';
-import { checkLoginStatusStart, checkLoginStatusSuccess, logout } from './redux/slices/authSlice';
+import { getJwtFromLocalStorage, getUserIdFromLocalStorage } from './services/authService';
 import { ProtectedRoutes } from './routes';
 import RegisterPage from './pages/Auth/RegisterPage';
 import Navbar from './components/NavBar';
 import { HomePage, SeriesPage, UserMoviesPage, UploadMoviesPage } from './pages';
-import { getJwtFromLocalStorage } from './services/authService';
+import { checkLoginStatusSuccess } from './redux/slices/authSlice';
 
 function App() {
     const dispatch = useAppDispatch();
 
     useEffect(() => {
-        dispatch(checkLoginStatusStart());
         const token = getJwtFromLocalStorage();
+        const userId = getUserIdFromLocalStorage();
+
+        // console.log('App.tsx - Token en localStorage:', token);
+        // console.log('App.tsx - UserId en localStorage:', userId);
+
         if (token) {
-            dispatch(checkLoginStatusSuccess(token));
-        } else {
-            dispatch(logout());
+            dispatch(checkLoginStatusSuccess({ token, userId })); // Sincroniza el token con Redux directamente
         }
     }, [dispatch]);
 
@@ -27,7 +29,7 @@ function App() {
         { label: 'Home', to: '/' },
         { label: 'Películas', to: '/movies' },
         { label: 'Series', to: '/series' },
-        { label: 'Subir Película', to: '/uploadmovie' },
+        { label: 'Subir Datos', to: '/uploadmovie' },
     ];
 
     return (

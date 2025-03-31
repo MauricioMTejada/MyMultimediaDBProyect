@@ -79,7 +79,7 @@ const UploadMoviesPage: React.FC = () => {
 
         // Eliminar csvCountry antes de enviar los datos
         const dataToSend = data.map(({ csvCountry, ...movie }) => movie);
-        console.log("Datos a enviar desde UploadMovies.tsx:", dataToSend);
+        // console.log("Datos a enviar desde UploadMovies.tsx:", dataToSend);
 
         try {
             await uploadMovies(dataToSend);
