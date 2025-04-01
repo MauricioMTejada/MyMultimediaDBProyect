@@ -3,55 +3,46 @@ import React from 'react';
 import { Country, CombinedMovieData, Movie } from '../../types/types';
 import TableHeader from './TableHeader';
 import TableBody from './TableBody';
+import { useAppSelector } from '../../hooks';
+import { useLocation } from 'react-router-dom';
 
 interface Props {
     data: (CombinedMovieData | Movie)[]; // Acepta ambos tipos de datos
-    countries: Country[];
-    onCountryChange: (rowIndex: number, newCountryId: number | undefined) => void;
-    isAssociated?: boolean; // Opcional
-    hideIdColumn?: boolean; // Nueva prop para ocultar la columna "id"
 }
 
-const Table: React.FC<Props> = ({ data, countries, onCountryChange, isAssociated, hideIdColumn = false }) => {
+// Función para obtener los encabezados de la tabla
+const getHeaders = (pathname: string, isLoggedIn: boolean): string[] => {
+    if (pathname === '/') {
+        const headers = ['id', 'arte', 'títulos', 'datos', 'otros datos'];
+        if (isLoggedIn) headers.push('asociar');
+        return headers;
+    }
+
+    if (pathname === '/movies') {
+        return ['datos de usuario', 'arte', 'títulos', 'datos', 'otros datos'];
+    }
+
+    return []; // Retorna un array vacío si no coincide con ninguna ruta
+};
+
+const Table: React.FC<Props> = ({ data }) => {
+
+    // Imprimir las propss para depuración
+    // console.log('Table.tsx - Props:', { data });
+
+    // Verificar si hay datos para mostrar
     if (data.length === 0) {
         return <p>No hay datos para mostrar.</p>;
     }
 
-    let headers: string[] = [];
-    const isCombinedData = 'userMovieId' in data[0];
+    // Verificar si el usuario está logueado
+    const isLoggedIn = useAppSelector((state) => state.auth.isLoggedIn);
 
-    if (isCombinedData) {
-        // Lista de columnas que NO queremos mostrar
-        const columnsToExclude = ['userMovieId', 'userId', 'selectOriginalTitle', 'watched', 'watchedDate', 'rewatchedDate', 'type', 'note', 'recommendationSource'];
+    // Verificar la dirección
+    const location = useLocation();
 
-        // Filtramos las columnas que no queremos mostrar
-        headers = Object.keys(data[0]).filter(header => !columnsToExclude.includes(header) && header !== 'image' && header !== 'originalTitle' && header !== 'otherTitles' && header !== 'title' && header !== 'year' && header !== 'director' && header !== 'cast' && header !== 'companies' && header !== 'countryId' && header !== 'genres' && header !== 'synopsis' && header !== 'isAssociated');
-
-        // Si hideIdColumn es true, eliminamos "id" de los headers
-        if (hideIdColumn) {
-            headers = headers.filter(header => header !== 'id');
-        }
-
-        // Insertamos las columnas especiales en el orden deseado
-        // Insertamos la nueva columna "Datos de usuario" en la posición 1
-        headers.splice(1, 0, 'Datos de usuario');
-        headers.splice(2, 0, 'image');
-        headers.splice(3, 0, 'titles');
-        headers.splice(4, 0, 'data');
-        headers.splice(5, 0, 'otherData');
-    } else {
-        headers = Object.keys(data[0]).filter(header => header !== 'image' && header !== 'originalTitle' && header !== 'otherTitles' && header !== 'title' && header !== 'year' && header !== 'director' && header !== 'cast' && header !== 'companies' && header !== 'countryId' && header !== 'genres' && header !== 'synopsis' && header !== 'isAssociated');
-        // Si hideIdColumn es true, eliminamos "id" de los headers
-        if (hideIdColumn) {
-            headers = headers.filter(header => header !== 'id');
-        }
-        headers.splice(1, 0, 'image');
-        headers.splice(2, 0, 'titles');
-        headers.splice(3, 0, 'data');
-        headers.splice(4, 0, 'otherData');
-        if (isAssociated) headers.push('Asociar');
-    }
-    // console.log('Table.tsx - onCheckboxChange:'); // Mover console.log aquí
+    // Obtener los encabezados de la tabla según la ruta actual
+    const headers = getHeaders(location.pathname, isLoggedIn);
 
     return (
         <div className="overflow-x-auto">
@@ -60,9 +51,6 @@ const Table: React.FC<Props> = ({ data, countries, onCountryChange, isAssociated
                 <TableBody
                     data={data}
                     headers={headers}
-                    countries={countries}
-                    onCountryChange={onCountryChange}
-                    isAssociated={isAssociated}
                 />
             </table>
         </div>

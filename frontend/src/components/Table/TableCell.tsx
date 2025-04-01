@@ -1,169 +1,194 @@
 // src/components/Table/TableCell.tsx
-import React, { useEffect } from 'react';
-import { Country, CombinedMovieData, Movie } from '../../types/types';
-import { useAppDispatch, useAppSelector } from '../../redux/hooks';
-import { toggleMovieAssociation, setAssociation } from '../../redux/slices/movieAssociationSlice';
+import React, { JSX, useState, useCallback } from 'react';
+import { CombinedMovieData, Movie } from '../../types/types';
 import { truncateText } from '../../utils/utils';
-import { setWatchedStatusStart, setWatchedStatusSuccess, setWatchedStatusFailure } from '../../redux/slices/userMovieSlice';
-import { checkMovieAssociation } from '../../services/movieAssociationService';
-import { updateUserMovie } from '../../services/userMovieService'; // Importar la nueva función
+import { useAppDispatch, useAppSelector } from '../../redux/hooks';
+import { getUserIdFromLocalStorage } from '../../services/authService'; // Obtener el userId
+import { addAssociateUserMovieService } from '../../services/userMovieService'; // Importar la nueva función
+import { deleteAssociateUserMovieService } from '../../services/userMovieService'; // Importar la nueva función
+import { addAssociateUserMovie, removeAssociateUserMovie } from '../../redux/slices/userMovieSlice'; // Importar las acciones para actualizar el estado de Redux
 
 interface Props {
     header: string;
     row: CombinedMovieData | Movie; // Acepta ambos tipos de datos
     rowIndex: number;
     colIndex: number;
-    countries: Country[];
-    onCountryChange: (rowIndex: number, newCountryId: number | undefined) => void;
-    isAssociated?: boolean; // Opcional
+    isChecked?: boolean; // Para la celda de asociación
+    loading?: boolean; // Para la celda de "datos de usuario"
+    watchedStatus?: string; // Para la celda de "datos de usuario"
+    onCheckboxChange?: (rowIndex: number, checked: boolean) => void; // Nueva prop para manejar el cambio del checkbox
 }
 
-const TableCell: React.FC<Props> = ({ header, row, rowIndex, colIndex, countries, onCountryChange, isAssociated }) => {
+// Función para renderizar la celda de "arte"
+const renderArteCell = (image: string | undefined) => {
+    return image ? (
+        <a href={image} target="_blank" rel="noopener noreferrer">
+            <img src={image} alt="Movie Poster" className="max-h-[150px] max-w-[150px] h-auto w-auto" />
+        </a>
+    ) : (
+        "No Image"
+    );
+};
+
+// Función para renderizar la celda de "títulos"
+const renderTitulosCell = (row: CombinedMovieData | Movie) => (
+    <div className="flex flex-col">
+        <div><b>Original:</b> {row.originalTitle ? truncateText(row.originalTitle) : "N/A"}</div>
+        <div><b>Alternativo:</b> {row.title ? truncateText(row.title) : "N/A"}</div>
+        <div><b>Otros títulos:</b> {row.otherTitles && row.otherTitles.length > 0
+            ? row.otherTitles.map((otherTitle, index) => (
+                <span key={index}>{truncateText(otherTitle.trim())}{index < row.otherTitles.length - 1 ? ', ' : ''}</span>
+            ))
+            : "N/A"}
+        </div>
+    </div>
+);
+
+// Función para renderizar la celda de "datos"
+const renderDatosCell = (row: CombinedMovieData | Movie) => (
+    <div className="flex flex-col">
+        <div><b>Año:</b> {row.year ? truncateText(row.year.toString()) : "N/A"}</div>
+        <div><b>Director:</b> {row.director ? truncateText(row.director).split(',').map((director, index) => (
+            <span key={index}>{truncateText(director.trim())}{index < truncateText(row.director).split(',').length - 1 ? ', ' : ''}</span>
+        )) : "N/A"}</div>
+        <div><b>Elenco:</b> {row.cast ? truncateText(row.cast).split(',').map((actor, index) => (
+            <span key={index}>{truncateText(actor.trim())}{index < truncateText(row.cast).split(',').length - 1 ? ', ' : ''}</span>
+        )) : "N/A"}</div>
+        <div><b>Compañías:</b> {row.companies ? truncateText(row.companies).split(',').map((company, index) => (
+            <span key={index}>{truncateText(company.trim())}{index < truncateText(row.companies).split(',').length - 1 ? ', ' : ''}</span>
+        )) : "N/A"}</div>
+    </div>
+);
+
+// Función para renderizar la celda de "otros datos"
+const renderOtrosDatosCell = (row: CombinedMovieData | Movie) => (
+    <div className="flex flex-col">
+        <div><b>Género:</b> {row.genres ? truncateText(row.genres).split(',').map((genre, index) => (
+            <span key={index}>{truncateText(genre.trim())}{index < truncateText(row.genres).split(',').length - 1 ? ', ' : ''}</span>
+        )) : "N/A"}</div>
+        <div><b>Sinopsis:</b> {row.synopsis ? truncateText(row.synopsis) : "N/A"}</div>
+    </div>
+);
+
+// Función para renderizar la celda de "datos de usuario"
+const renderDatosUsuarioCell = (row: CombinedMovieData, watchedStatus: string | undefined, loading: boolean | undefined) => {
+    const rewatchedDates = row.rewatchedDate; // Variable auxiliar
+    return (
+        <div className="flex flex-col">
+            <div><b>Visto:</b></div>
+            <select
+                value={watchedStatus || 'No'}
+                disabled={loading}
+                className="block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
+            >
+                <option value="Si">Si</option>
+                <option value="No">No</option>
+                <option value="Viendo">Viendo</option>
+            </select>
+            <div><b>Fecha Visto:</b> {row.watchedDate ? row.watchedDate.toLocaleDateString() : "N/A"}</div>
+            <div><b>Fecha Vuelta a ver:</b> {rewatchedDates && Array.isArray(rewatchedDates) && rewatchedDates.length > 0
+                ? rewatchedDates.map((date, index) => (
+                    <span key={index}>{date.toLocaleDateString()}{index < rewatchedDates.length - 1 ? ', ' : ''}</span>
+                ))
+                : "N/A"}
+            </div>
+            <div><b>Tipo:</b> {row.type || "N/A"}</div>
+            <div><b>Nota:</b> {row.note || "N/A"}</div>
+            <div><b>Origen de Recomendación:</b> {row.recommendationSource || "N/A"}</div>
+        </div>
+    );
+};
+
+// Función para renderizar la celda de "asociar"
+const renderAsociarCell = (
+    isChecked: boolean | undefined,
+    onChange: (checked: boolean) => void,
+    movieId: number,
+    isAssociated: boolean,
+    row: CombinedMovieData | Movie
+) => {
     const dispatch = useAppDispatch();
-    const userId = useAppSelector((state) => state.auth.userId); // Obtener el userId de Redux
-    const isLoggedIn = useAppSelector((state) => state.auth.isLoggedIn); // Obtener el isLoggedIn de Redux
-    const isChecked = useAppSelector((state) => state.movieAssociation.associations[row.id] || false);
-    const watchedStatus = useAppSelector((state) => state.userMovie.watchedStatus[row.userMovieId]);
-    const loading = useAppSelector((state) => state.userMovie.loading);
-    const token = useAppSelector((state) => state.auth.token); // Obtener el token de Redux
+    const userId = useAppSelector((state) => state.auth.userId); // Obtener el userId del estado de Redux
 
-    // useEffect(() => {
-    //     const checkAssociation = async (token: string) => {
-    //         if (!isLoggedIn || !userId || 'userMovieId' in row || !token) return; // No hacer nada si no está logueado o si es CombinedMovieData o no hay token
-    //         try {
-    //             const data = await checkMovieAssociation(row.id, token);
-    //             dispatch(setAssociation({ movieId: row.id, checked: data }));
-    //         } catch (error) {
-    //             console.error('Error checking association:', error);
-    //         }
-    //     };
-    //     if (isAssociated !== undefined) {
-    //         checkAssociation(token!);
-    //     }
-    // }, [dispatch, isAssociated, row.id, isLoggedIn, userId, token]); // Dependencia token
+    const handleCheckboxChange = async (checked: boolean) => {
+        try {
+            if (!userId) {
+                throw new Error('El userId no está disponible. El usuario debe estar autenticado.');
+            }
 
-    const handleCheckboxChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        const checked = event.target.checked;
-        // console.log(`TableCell.tsx - onChange - row.id: ${row.id}, checked: ${checked}`);
-        if (userId) {
-            dispatch(toggleMovieAssociation({ userId, movieId: row.id, checked }));
+            if (checked) {
+                // Asociar película
+                const userMovieData: CombinedMovieData = {
+                    ...row,
+                    movieId,
+                    userMovieId: 0, // Valor predeterminado, se actualizará en el backend
+                    userId,
+                    watched: "No", // Valor predeterminado
+                    watchedDate: null,
+                    rewatchedDate: null,
+                    selectOriginalTitle: false, // Valor predeterminado
+                };
+
+                await addAssociateUserMovieService(movieId, userMovieData, (newUserMovie) => {
+                    dispatch(addAssociateUserMovie(newUserMovie)); // Actualizar el estado de Redux
+                });
+            } else {
+                // Eliminar asociación
+                await deleteAssociateUserMovieService(movieId);
+                dispatch(removeAssociateUserMovie(movieId)); // Actualizar el estado de Redux eliminando la película
+                console.log(`Asociación eliminada para la película con ID ${movieId}.`);
+            }
+
+            onChange(checked); // Actualizar el estado del checkbox
+        } catch (error) {
+            console.error('Error al asociar/desasociar película:', error);
         }
     };
 
-    // const handleWatchedChange = async (event: React.ChangeEvent<HTMLSelectElement>) => {
-    //     const newWatchedStatus = event.target.value;
-    //     const userMovieId = (row as CombinedMovieData).userMovieId; // Asegurar que row es CombinedMovieData
+    return (
+        <input
+            type="checkbox"
+            checked={isAssociated}
+            onChange={(e) => handleCheckboxChange(e.target.checked)}
+            className="form-checkbox h-4 w-4 text-indigo-600 transition duration-150 ease-in-out"
+        />
+    );
+};
 
-    //     dispatch(setWatchedStatusStart());
-    //     try {
-    //         if(token){
-    //             await updateUserMovie(userMovieId, newWatchedStatus, token); // Llamada a la API
-    //             dispatch(setWatchedStatusSuccess({ userMovieId, watched: newWatchedStatus }));
-    //         }
-    //     } catch (error: any) {
-    //         dispatch(setWatchedStatusFailure(error.message || 'Error al actualizar el estado de visto'));
-    //     }
-    // };
+const TableCell: React.FC<Props> = React.memo(({ header, row, rowIndex, colIndex, isChecked, loading, watchedStatus, onCheckboxChange }) => {
+    const [localChecked, setLocalChecked] = useState(isChecked || false); // Estado local del checkbox
 
-    let cellValue: any;
-    let cellContent: any;
+    const handleCheckboxChange = useCallback(
+        (checked: boolean) => {
+            setLocalChecked(checked); // Actualizar el estado local
+            if (onCheckboxChange) {
+                onCheckboxChange(rowIndex, checked); // Notificar al padre si es necesario
+            }
+        },
+        [rowIndex, onCheckboxChange]
+    );
 
-    /* if (header === 'image') {
-        cellValue = row.image;
-        cellContent = cellValue ? (
-            <a href={cellValue} target="_blank" rel="noopener noreferrer">
-                <img src={cellValue} alt="Movie Poster" className="max-h-[150px] max-w-[150px] h-auto w-auto" />
-            </a>
-        ) : (
-            "No Image"
-        );
-    } else if (header === 'titles') {
-        cellContent = (
-            <div className="flex flex-col">
-                <div><b>Original:</b> {row.originalTitle ? truncateText(row.originalTitle) : "N/A"}</div>
-                <div><b>Alternativo:</b> {row.title ? truncateText(row.title) : "N/A"}</div>
-                <div><b>Otros títulos:</b> {row.otherTitles && row.otherTitles.length > 0 ? row.otherTitles.map((otherTitle: string, index: number) => <span key={index}>{truncateText(otherTitle.trim())}{index < row.otherTitles.length - 1 ? ', ' : ''}</span>) : "N/A"}</div>
-            </div>
-        );
-    } else if (header === 'data') {
-        cellContent = (
-            <div className="flex flex-col">
-                <div><b>Año:</b> {row.year ? truncateText(row.year.toString()) : "N/A"}</div>
-                <div><b>Director:</b> {row.director ? truncateText(row.director).split(',').map((director: string, index: number) => <span key={index}>{truncateText(director.trim())}{index < truncateText(row.director).split(',').length - 1 ? ', ' : ''}</span>) : "N/A"}</div>
-                <div><b>Elenco:</b> {row.cast ? truncateText(row.cast).split(',').map((actor: string, index: number) => <span key={index}>{truncateText(actor.trim())}{index < truncateText(row.cast).split(',').length - 1 ? ', ' : ''}</span>) : "N/A"}</div>
-                <div><b>Compañías:</b> {row.companies ? truncateText(row.companies).split(',').map((company: string, index: number) => <span key={index}>{truncateText(company.trim())}{index < truncateText(row.companies).split(',').length - 1 ? ', ' : ''}</span>) : "N/A"}</div>
-            </div>
-        );
-    } else if (header === 'otherData') {
-        cellContent = (
-            <div className="flex flex-col">
-                <div><b>Género:</b> {row.genres ? truncateText(row.genres).split(',').map((genre: string, index: number) => <span key={index}>{truncateText(genre.trim())}{index < truncateText(row.genres).split(',').length - 1 ? ', ' : ''}</span>) : "N/A"}</div>
-                <div><b>Sinopsis:</b> {row.synopsis ? truncateText(row.synopsis) : "N/A"}</div>
-            </div>
-        );
-    } else if (header === 'País y csvCountry') {
-        cellContent = (
-            <div className="flex flex-col">
-                <select
-                    className="block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
-                    value={row.countryId?.toString() ?? ""}
-                    onChange={(e) => {
-                        const selectedCountryId = e.target.value === "" ? undefined : parseInt(e.target.value);
-                        onCountryChange(rowIndex, selectedCountryId);
-                    }}
-                >
-                    <option value="">Seleccionar país</option>
-                    {countries.map(country => (
-                        <option key={country.id} value={country.id}>
-                            {country.name}
-                        </option>
-                    ))}
-                </select>
-                <div className="mt-1 text-gray-500">csvCountry: {row.csvCountry}</div>
-            </div>
-        );
-    } else if (header === 'Datos de usuario' && 'userMovieId' in row) {
-        const rewatchedDates = (row as CombinedMovieData).rewatchedDate; // Variable auxiliar
-        cellContent = (
-            <div className="flex flex-col">
-                <select
-                    value={watchedStatus || 'No'}
-                    onChange={handleWatchedChange}
-                    disabled={loading}
-                    className="block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
-                >
-                    <option value="Si">Si</option>
-                    <option value="No">No</option>
-                    <option value="Viendo">Viendo</option>
-                </select>
-                <div><b>Fecha Visto:</b> {(row as CombinedMovieData).watchedDate ? (row as CombinedMovieData).watchedDate?.toLocaleDateString() : "N/A"}</div>
-                <div><b>Fecha Vuelta a ver:</b> {rewatchedDates && Array.isArray(rewatchedDates) && rewatchedDates.length > 0 ? rewatchedDates.map((date: Date, index: number) => <span key={index}>{date.toLocaleDateString()}{index < rewatchedDates.length - 1 ? ', ' : ''}</span>) : "N/A"}</div>
-                <div><b>Tipo:</b> {(row as CombinedMovieData).type ? (row as CombinedMovieData).type : "N/A"}</div>
-                <div><b>Nota:</b> {(row as CombinedMovieData).note ? (row as CombinedMovieData).note : "N/A"}</div>
-                <div><b>Origen de Recomendación:</b> {(row as CombinedMovieData).recommendationSource ? (row as CombinedMovieData).recommendationSource : "N/A"}</div>
-            </div>
-        );
-    } else if (header === 'Asociar' && isAssociated !== undefined && !('userMovieId' in row)) {
-        cellContent = (
-            <input
-                type="checkbox"
-                checked={isChecked}
-                onChange={handleCheckboxChange}
-                className="form-checkbox h-4 w-4 text-indigo-600 transition duration-150 ease-in-out"
-            />
-        );
-    } else {
-        cellValue = row[header as keyof (CombinedMovieData | Movie)];
-        cellContent = typeof cellValue === 'object' ? JSON.stringify(cellValue) : cellValue !== undefined && cellValue !== null ? cellValue : "N/A";
-    }
+    // Mapa de funciones para renderizar celdas según el encabezado
+    const cellRenderers: Record<string, (row: CombinedMovieData | Movie) => JSX.Element | string> = {
+        arte: () => renderArteCell(row.image),
+        títulos: () => renderTitulosCell(row),
+        datos: () => renderDatosCell(row),
+        'otros datos': () => renderOtrosDatosCell(row),
+        'datos de usuario': () => renderDatosUsuarioCell(row as CombinedMovieData, watchedStatus, loading),
+        asociar: () =>
+            renderAsociarCell(localChecked, handleCheckboxChange, row.id, row.isAssociated, row), // Usar estado local
+    };
+
+    // Renderizar la celda según el encabezado o manejar el caso predeterminado
+    const cellContent = cellRenderers[header]
+        ? cellRenderers[header](row)
+        : row[header as keyof (CombinedMovieData | Movie)] ?? "N/A";
 
     return (
         <td key={`${rowIndex}-${colIndex}`} className="px-6 py-4 whitespace-nowrap">
             {cellContent}
         </td>
-    );*/
-
-    return <></>
-};
+    );
+});
 
 export default TableCell;

@@ -1,5 +1,5 @@
 // src/components/Table/OldTable.tsx
-import React from 'react';
+/* import React from 'react';
 import { Movie, Country } from '../../types/types';
 import { truncateText } from '../../utils/utils';
 
@@ -156,4 +156,4 @@ const OldTable: React.FC<Props> = ({ data, countries, onCountryChange }) => {
     );
 };
 
-export default OldTable;
+export default OldTable; */

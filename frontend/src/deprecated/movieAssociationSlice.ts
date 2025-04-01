@@ -1,5 +1,5 @@
 // src/redux/slices/movieAssociationSlice.ts
-import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
+/* import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import { api } from '../../utils/apiConfig';
 
 // Exportar la interfaz MovieAssociationState
@@ -21,9 +21,9 @@ export const toggleMovieAssociation = createAsyncThunk(
     async ({ userId, movieId, checked }: { userId: number; movieId: number; checked: boolean }, { rejectWithValue }) => {
         try {
             if (checked) {
-                await api.post(`/users/${userId}/movies/${movieId}`, { userId, movieId });
+                await api.post(`/users/movies/:movieId`, { userId, movieId });
             } else {
-                await api.delete(`/users/${userId}/movies/${movieId}`);
+                await api.delete(`/users/movies/:movieId`);
             }
             return { movieId, checked };
         } catch (error: any) {
@@ -37,7 +37,8 @@ export const fetchInitialAssociations = createAsyncThunk(
     'movieAssociation/fetchInitialAssociations',
     async (userId: number, { rejectWithValue }) => {
         try {
-            const response = await api.get(`/users/${userId}/movies`);
+            const response = await api.get(`/users/usermovies`);
+            console.log(`Response data:`, response.data); // Imprimir la respuesta para depuración
             const data = response.data;
             const initialAssociations: { [movieId: number]: boolean } = {};
             data.forEach((movie: any) => {
@@ -87,4 +88,4 @@ const movieAssociationSlice = createSlice({
 });
 
 export const { setAssociation } = movieAssociationSlice.actions;
-export default movieAssociationSlice.reducer;
+export default movieAssociationSlice.reducer; */

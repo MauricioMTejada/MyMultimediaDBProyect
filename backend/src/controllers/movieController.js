@@ -85,6 +85,8 @@ const uploadMoviesToDatabase = async (req, res) => {
 };
 
 const createUserMovie = async (req, res) => {
+
+    // console.log('createUserMovie - Datos recibidos:', req.body); // Loguear los datos recibidos
     const { movieId } = req.params;
     const userId = req.user.userId; // Obtener el userId del token
     try {
@@ -97,8 +99,10 @@ const createUserMovie = async (req, res) => {
 };
 
 const deleteUserMovie = async (req, res) => {
-    const { movieId } = req.params;
+    const movieId = parseInt(req.params.movieId, 10);
     const userId = req.user.userId; // Obtener el userId del token
+    // console.log('movieId:', movieId); // Loguear el movieId
+    // console.log('userId:', userId); // Loguear el userId
     try {
         const userMovie = await UserMovie.findOne({ where: { userId, movieId } });
         if (!userMovie) {
@@ -136,9 +140,15 @@ const getUserMovies = async (req, res) => {
             attributes: { exclude: ['createdAt', 'updatedAt'] } // Excluir atributos innecesarios
         });
 
+        // console.log('userMovies:', userMovies); // Loguear el resultado de userMovies
+
         const combinedData = userMovies.map(userMovie => {
             const movieData = userMovie.Movie.get({ plain: true }); // Obtener los datos de la película como un objeto plano
             const userMovieData = userMovie.get({ plain: true }); // Obtener los datos de UserMovie como un objeto plano
+
+            // Eliminar la propiedad Movie del objeto userMovieData
+            delete userMovieData.Movie;
+
             return {
                 ...movieData, // Usar los datos planos de la película
                 ...userMovieData, // Usar los datos planos de UserMovie

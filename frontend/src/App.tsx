@@ -2,28 +2,33 @@
 import { useEffect } from 'react';
 import { Routes, Route } from 'react-router-dom';
 import LoginPages from './pages/Auth/LoginPage';
-import { useAppDispatch } from './redux/hooks';
+import { useAppDispatch, useAppSelector } from './redux/hooks';
 import { getJwtFromLocalStorage, getUserIdFromLocalStorage } from './services/authService';
 import { ProtectedRoutes } from './routes';
 import RegisterPage from './pages/Auth/RegisterPage';
 import Navbar from './components/NavBar';
 import { HomePage, SeriesPage, UserMoviesPage, UploadMoviesPage } from './pages';
 import { checkLoginStatusSuccess } from './redux/slices/authSlice';
+import { loadUserMovies } from './redux/slices/userMovieSlice'; // Importa la nueva acción
 
 function App() {
     const dispatch = useAppDispatch();
+    const isLoggedIn = useAppSelector((state) => state.auth.isLoggedIn); // Obtener el estado de isLoggedIn
 
     useEffect(() => {
         const token = getJwtFromLocalStorage();
         const userId = getUserIdFromLocalStorage();
 
-        // console.log('App.tsx - Token en localStorage:', token);
-        // console.log('App.tsx - UserId en localStorage:', userId);
-
         if (token) {
             dispatch(checkLoginStatusSuccess({ token, userId })); // Sincroniza el token con Redux directamente
         }
     }, [dispatch]);
+
+    useEffect(() => {
+        if (isLoggedIn) {
+            dispatch(loadUserMovies()); // Carga las películas del usuario
+        }
+    }, [isLoggedIn, dispatch]);
 
     const navLinks = [
         { label: 'Home', to: '/' },
