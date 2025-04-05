@@ -6,7 +6,6 @@ import { CombinedMovieData } from '../../types/types';
 // Exportar la interfaz UserMovieState
 export interface UserMovieState {
     userMovies: CombinedMovieData[];
-    watchedStatus: { [userMovieId: number]: string }; // { userMovieId: 'Sí' | 'No' | 'Viendo' }
     loading: boolean;
     error: string | null;
     movieIdsOfUser: number[]; // Nuevo estado para guardar los movieIds
@@ -14,7 +13,6 @@ export interface UserMovieState {
 
 const initialState: UserMovieState = {
     userMovies: [],
-    watchedStatus: {},
     loading: false,
     error: null,
     movieIdsOfUser: [], // Inicializar el array de movieIds
@@ -37,11 +35,11 @@ const userMovieSlice = createSlice({
     name: 'userMovie',
     initialState,
     reducers: {
-        setWatchedStatusStart: (state) => {
+        /* setWatchedStatusStart: (state) => {
             state.loading = true;
             state.error = null;
         },
-        setWatchedStatusSuccess: (state, action: PayloadAction<{ userMovieId: number; watched: string }>) => {
+         setWatchedStatusSuccess: (state, action: PayloadAction<{ userMovieId: number; watched: string }>) => {
             state.watchedStatus[action.payload.userMovieId] = action.payload.watched;
             state.loading = false;
         },
@@ -51,45 +49,71 @@ const userMovieSlice = createSlice({
         },
         setInitialWatchedStatus: (state, action: PayloadAction<{ [userMovieId: number]: string }>) => {
             state.watchedStatus = action.payload;
-        },
+        }, */
+
+        // cuando se asocia una película, se agrega al estado la película sin tener que realizar una nueva solicitud al backend
         addAssociateUserMovie: (state, action: PayloadAction<CombinedMovieData>) => {
-            state.userMovies.push(action.payload); // Agregar la nueva película al estado
-            state.movieIdsOfUser.push(action.payload.movieId); // Agregar el movieId al array
+            console.log({state});
+            console.log(`Película con ID ${action.payload} asociada exitosamente.`);
+            console.log(action.payload); // Imprimir la película asociada para depuración
+            // state.userMovies = [...state.userMovies, action.payload]; // Usar spread operator para agregar la nueva película
+            // state.movieIdsOfUser = [...state.movieIdsOfUser, action.payload.movieId]; // Usar spread operator para agregar el movieId
+            return {
+                ...state,
+                userMovies: [...state.userMovies, action.payload],
+                movieIdsOfUser: [...state.movieIdsOfUser, action.payload.movieId]
+            };
         },
+
+        // cuando se elimina la asociación de una película, se elimina del estado sin tener que realizar una nueva solicitud al backend
         removeAssociateUserMovie: (state, action: PayloadAction<number>) => {
-            const movieId = action.payload;
-            state.userMovies = state.userMovies.filter((movie) => movie.movieId !== movieId); // Eliminar la película del estado
-            state.movieIdsOfUser = state.movieIdsOfUser.filter((id) => id !== movieId); // Eliminar el movieId del array
+            // const movieId = action.payload;
+            // state.userMovies = state.userMovies.filter((movie) => movie.movieId !== movieId); // Eliminar la película del estado
+            // state.movieIdsOfUser = state.movieIdsOfUser.filter((id) => id !== movieId); // Eliminar el movieId del array
+            return {
+                ...state,
+                userMovies: state.userMovies.filter((movie) => movie.movieId !== action.payload),
+                movieIdsOfUser: state.movieIdsOfUser.filter((id) => id !== action.payload),
+            };
         },
     },
     extraReducers: (builder) => {
         builder
             .addCase(loadUserMovies.pending, (state) => {
-                state.loading = true;
-                state.error = null;
+                // state.loading = true;
+                // state.error = null;
+                return {
+                    ...state,
+                    loading: true,
+                    error: null,
+                };
             })
             .addCase(loadUserMovies.fulfilled, (state, action: PayloadAction<CombinedMovieData[]>) => {
-                state.loading = false;
-                state.userMovies = action.payload;
-                // Inicializar watchedStatus basado en los datos recibidos
-                action.payload.forEach((movie) => {
-                    state.watchedStatus[movie.userMovieId] = movie.watched;
-                });
+                // state.loading = false;
+                // state.userMovies = action.payload;
+
                 // Extract movie IDs and update the state
-                state.movieIdsOfUser = action.payload.map((movie) => movie.movieId); // Extraer los movieIds y guardarlos en el estado
+                // state.movieIdsOfUser = action.payload.map((movie) => movie.movieId); // Extraer los movieIds y guardarlos en el estado
+                return {
+                    ...state,
+                    loading: false,
+                    userMovies: action.payload,
+                    movieIdsOfUser: action.payload.map((movie) => movie.movieId), // Extraer los movieIds y guardarlos en el estado
+                };
             })
             .addCase(loadUserMovies.rejected, (state, action: PayloadAction<any>) => {
-                state.loading = false;
-                state.error = action.payload;
+                // state.loading = false;
+                // state.error = action.payload;
+                return {
+                    ...state,
+                    loading: false,
+                    error: action.payload,
+                };
             });
     },
 });
 
 export const {
-    setWatchedStatusStart,
-    setWatchedStatusSuccess,
-    setWatchedStatusFailure,
-    setInitialWatchedStatus,
     addAssociateUserMovie,
     removeAssociateUserMovie,
 } = userMovieSlice.actions;

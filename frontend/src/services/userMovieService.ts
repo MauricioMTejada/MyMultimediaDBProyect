@@ -1,6 +1,6 @@
 // frontend/src/services/userMovieService.ts
 import { api } from '../utils/apiConfig';
-import { CombinedMovieData, Country } from '../types/types';
+import { CombinedMovieData, Country, UserMovie } from '../types/types';
 
 export const fetchUserMovies = async (): Promise<CombinedMovieData[]> => {
     try {
@@ -28,21 +28,19 @@ export const updateUserMovie = async (userMovieId: number, watched: string): Pro
     }
 };
 
-export const addAssociateUserMovieService = async (
-    movieId: number,
-    userMovieData: CombinedMovieData,
-    onSuccess: (newUserMovie: CombinedMovieData) => void // Callback para actualizar Redux
-): Promise<void> => {
-    try {
-        const response = await api.post(`/users/movies/${movieId}`);
-        if (!response.status.toString().startsWith('2')) {
-            throw new Error('Error al asociar la película');
-        }
-        console.log(`Película con ID ${movieId} asociada exitosamente.`);
-        onSuccess(userMovieData); // Llamar al callback con los datos de la película
-    } catch (error: any) {
-        throw new Error(error.response?.data?.message || 'Error al asociar la película');
-    }
+export const addAssociateUserMovieService = async ( movieId: number ): Promise<UserMovie> => {
+	try {
+		const response = await api.post(`/users/movies/${movieId}`);
+		if (!response.status.toString().startsWith("2")) {
+			throw new Error("Error al asociar la película");
+		}
+		// console.log(`Película con ID ${movieId} asociada exitosamente.`);
+		return response.data.userMovie; // Retornar los datos de la película asociada
+	} catch (error: any) {
+		throw new Error(
+			error.response?.data?.message || "Error al asociar la película"
+		);
+	}
 };
 
 export const deleteAssociateUserMovieService = async (movieId: number): Promise<void> => {

@@ -3,7 +3,6 @@ import React, { useState, useEffect } from 'react';
 import Table from '../../components/Table/Table';
 import { CombinedMovieData, Country } from '../../types/types';
 import { useAppDispatch, useAppSelector } from '../../redux/hooks';
-import { setInitialWatchedStatus } from '../../redux/slices/userMovieSlice';
 import { fetchUserMovies, fetchCountries } from '../../services/userMovieService';
 
 const UserMoviesPage: React.FC = () => {
@@ -24,11 +23,11 @@ const UserMoviesPage: React.FC = () => {
                     setCombinedData(data);
 
                     // Inicializar el estado de watchedStatus en Redux
-                    const initialWatchedStatus: { [userMovieId: number]: string } = {};
-                    data.forEach(userMovie => {
-                        initialWatchedStatus[userMovie.userMovieId] = userMovie.watched;
-                    });
-                    dispatch(setInitialWatchedStatus(initialWatchedStatus));
+                    // const initialWatchedStatus: { [userMovieId: number]: string } = {};
+                    // data.forEach(userMovie => {
+                    //     initialWatchedStatus[userMovie.userMovieId] = userMovie.watched;
+                    // });
+                    // dispatch(setInitialWatchedStatus(initialWatchedStatus));
                 } else {
                     setCombinedData([]); // Si no hay token, no hay datos
                 }
@@ -65,9 +64,7 @@ const UserMoviesPage: React.FC = () => {
             {combinedData.length > 0 && (
                 <Table
                     data={combinedData}
-                    countries={countries}
-                    onCountryChange={handleCountryChange}
-                    hideIdColumn={true} // Indicamos que se oculte la columna "id"
+
                 />
             )}
         </div>
