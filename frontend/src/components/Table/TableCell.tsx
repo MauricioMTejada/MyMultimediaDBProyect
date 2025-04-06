@@ -1,7 +1,15 @@
 // src/components/Table/TableCell.tsx
 import React, { useState, useEffect, JSX } from 'react';
 import { CombinedMovieData, Movie } from '../../types/types';
-import { renderIdCell, renderArteCell, renderAsociarCell, renderDatosCell, renderDatosUsuarioCell, renderOtrosDatosCell, renderTitulosCell } from './TableCellFunctions';
+import {
+	renderIdCell,
+	renderArteCell,
+	renderAsociarCell,
+	renderDatosCell,
+	renderDatosUsuarioCell,
+	renderOtrosDatosCell,
+	renderTitulosCell,
+} from "./TableCellFunctions";
 
 interface Props {
     header: string;
@@ -10,7 +18,7 @@ interface Props {
     colIndex: number;
 }
 
-const TableCell: React.FC<Props> = React.memo(({ header, row, rowIndex, colIndex }) => {
+const TableCell: React.FC<Props> = ({ header, row, rowIndex, colIndex }) => {
     const [localChecked, setLocalChecked] = useState(row.isAssociated || false); // Estado local del checkbox
 
     // Sincronizar localChecked con row.isAssociated cuando cambie
@@ -41,6 +49,6 @@ const TableCell: React.FC<Props> = React.memo(({ header, row, rowIndex, colIndex
             {cellContent}
         </td>
     );
-});
+};
 
 export default TableCell;

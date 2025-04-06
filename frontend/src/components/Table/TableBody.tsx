@@ -8,7 +8,7 @@ interface Props {
     headers: string[];
 }
 
-const TableBody: React.FC<Props> = React.memo(({ data, headers }) => {
+const TableBody: React.FC<Props> = ({ data, headers }) => {
     // console.log('TableBody.tsx: ', data); // Imprimir los encabezados para depuración
     return (
         <tbody className="bg-white divide-y divide-gray-200">
@@ -27,6 +27,6 @@ const TableBody: React.FC<Props> = React.memo(({ data, headers }) => {
             ))}
         </tbody>
     );
-});
+};
 
 export default TableBody;
