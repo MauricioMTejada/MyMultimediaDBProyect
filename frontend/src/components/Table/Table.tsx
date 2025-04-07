@@ -13,7 +13,7 @@ const Table: React.FC = () => {
 
     const headers = useCallback(() => getTableHeaders(location.pathname, isLoggedIn), [location.pathname, isLoggedIn]);
     const combinedData = useTableData(location.pathname);
-    console.log("Table.tsx: ", combinedData); // Imprimir los encabezados para depuración
+    // console.log("Table.tsx: ", combinedData); // Imprimir los encabezados para depuración
 
     return (
         <div className="overflow-x-auto">

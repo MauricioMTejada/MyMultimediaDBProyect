@@ -9,7 +9,7 @@ const AllMovies: React.FC = () => {
 
     useEffect(() => {
         dispatch(fetchMoviesThunk());
-        console.log("AllMovies.tsx - Despachando fetchMoviesThunk");
+        // console.log("AllMovies.tsx - Despachando fetchMoviesThunk");
     }, [dispatch]);
 
     return (

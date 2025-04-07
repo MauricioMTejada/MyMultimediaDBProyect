@@ -4,12 +4,14 @@ import { CombinedMovieData, Movie } from '../../types/types';
 import {
 	renderIdCell,
 	renderArteCell,
-	renderAsociarCell,
 	renderDatosCell,
-	renderDatosUsuarioCell,
 	renderOtrosDatosCell,
 	renderTitulosCell,
 } from "./TableCellFunctions";
+import { renderDatosUsuarioCell } from './tableFunctions/datosUsuarios';
+import { renderAsociarCell } from './tableFunctions/asociarCell';
+
+
 
 interface Props {
     header: string;

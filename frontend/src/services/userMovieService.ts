@@ -20,37 +20,56 @@ export const fetchCountries = async (): Promise<Country[]> => {
     }
 };
 
-export const updateUserMovie = async (userMovieId: number, watched: string): Promise<void> => {
+export const addAssociateUserMovieService = async (movieId: number): Promise<UserMovie> => {
     try {
-        await api.put(`/usermovies/${userMovieId}`, { watched });
-    } catch (error: any) {
-        throw new Error(error.response?.data?.message || 'Error al actualizar el estado de visto');
-    }
-};
+        const response = await api.post(`/users/movies/${movieId}`);
 
-export const addAssociateUserMovieService = async ( movieId: number ): Promise<UserMovie> => {
-	try {
-		const response = await api.post(`/users/movies/${movieId}`);
-		if (!response.status.toString().startsWith("2")) {
-			throw new Error("Error al asociar la película");
-		}
-		// console.log(`Película con ID ${movieId} asociada exitosamente.`);
-		return response.data.userMovie; // Retornar los datos de la película asociada
-	} catch (error: any) {
-		throw new Error(
-			error.response?.data?.message || "Error al asociar la película"
-		);
-	}
+        if (response.status === 201) {
+            console.log("El registro ha sido creado:", response.data);
+        } else if (response.status === 200) {
+            console.log("El registro ya existe y se ha reactivado:", response.data);
+        } else if (response.status === 409) {
+            console.log("El registro ya existe y está activo.");
+        }
+
+        return response.data.userMovie; // Retornar los datos de la película asociada
+    } catch (error: any) {
+        console.error(
+            error.response?.data?.message || "Error al asociar la película"
+        );
+        throw new Error(
+            error.response?.data?.message || "Error al asociar la película"
+        );
+    }
 };
 
 export const deleteAssociateUserMovieService = async (movieId: number): Promise<void> => {
     try {
-        const response = await api.delete(`/users/movies/${movieId}`);
+        const response = await api.put(`/users/movies/${movieId}`); // Usar PUT con la misma ruta
         if (!response.status.toString().startsWith('2')) {
-            throw new Error('Error al eliminar la asociación de la película');
+            throw new Error('Error al desactivar la asociación de la película');
         }
-        console.log(`Asociación de la película con ID ${movieId} eliminada exitosamente.`);
+        console.log(`Asociación de la película con ID ${movieId} desactivada exitosamente.`);
     } catch (error: any) {
-        throw new Error(error.response?.data?.message || 'Error al eliminar la asociación de la película');
+        throw new Error(error.response?.data?.message || 'Error al desactivar la asociación de la película');
+    }
+};
+
+export const submitUserMovieForm = async (data: {
+    id: number;
+    watched: string;
+    note: string;
+    recommendationSource: string;
+}): Promise<void> => {
+    try {
+        // Ruta pendiente por definir
+        await api.put(`/users/usermovies/${data.id}`, {
+            watched: data.watched,
+            note: data.note,
+            recommendationSource: data.recommendationSource,
+        });
+        console.log("Formulario enviado exitosamente:", data);
+    } catch (error: any) {
+        throw new Error(error.response?.data?.message || "Error al enviar el formulario");
     }
 };

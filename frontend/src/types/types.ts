@@ -29,6 +29,7 @@ export interface UserMovie {
     note: string | null;
     recommendationSource: string | null;
     selectOriginalTitle: boolean;
+    currentActive: boolean; // Indica si el usuario está activo
 }
 
 // MovieWithUserMovie es una combinación de Movie y UserMovie

@@ -35,29 +35,8 @@ const userMovieSlice = createSlice({
     name: 'userMovie',
     initialState,
     reducers: {
-        /* setWatchedStatusStart: (state) => {
-            state.loading = true;
-            state.error = null;
-        },
-         setWatchedStatusSuccess: (state, action: PayloadAction<{ userMovieId: number; watched: string }>) => {
-            state.watchedStatus[action.payload.userMovieId] = action.payload.watched;
-            state.loading = false;
-        },
-        setWatchedStatusFailure: (state, action: PayloadAction<string>) => {
-            state.loading = false;
-            state.error = action.payload;
-        },
-        setInitialWatchedStatus: (state, action: PayloadAction<{ [userMovieId: number]: string }>) => {
-            state.watchedStatus = action.payload;
-        }, */
-
         // cuando se asocia una película, se agrega al estado la película sin tener que realizar una nueva solicitud al backend
         addAssociateUserMovie: (state, action: PayloadAction<CombinedMovieData>) => {
-            console.log({state});
-            console.log(`Película con ID ${action.payload} asociada exitosamente.`);
-            console.log(action.payload); // Imprimir la película asociada para depuración
-            // state.userMovies = [...state.userMovies, action.payload]; // Usar spread operator para agregar la nueva película
-            // state.movieIdsOfUser = [...state.movieIdsOfUser, action.payload.movieId]; // Usar spread operator para agregar el movieId
             return {
                 ...state,
                 userMovies: [...state.userMovies, action.payload],
@@ -67,9 +46,6 @@ const userMovieSlice = createSlice({
 
         // cuando se elimina la asociación de una película, se elimina del estado sin tener que realizar una nueva solicitud al backend
         removeAssociateUserMovie: (state, action: PayloadAction<number>) => {
-            // const movieId = action.payload;
-            // state.userMovies = state.userMovies.filter((movie) => movie.movieId !== movieId); // Eliminar la película del estado
-            // state.movieIdsOfUser = state.movieIdsOfUser.filter((id) => id !== movieId); // Eliminar el movieId del array
             return {
                 ...state,
                 userMovies: state.userMovies.filter((movie) => movie.movieId !== action.payload),
@@ -80,8 +56,6 @@ const userMovieSlice = createSlice({
     extraReducers: (builder) => {
         builder
             .addCase(loadUserMovies.pending, (state) => {
-                // state.loading = true;
-                // state.error = null;
                 return {
                     ...state,
                     loading: true,
@@ -89,11 +63,6 @@ const userMovieSlice = createSlice({
                 };
             })
             .addCase(loadUserMovies.fulfilled, (state, action: PayloadAction<CombinedMovieData[]>) => {
-                // state.loading = false;
-                // state.userMovies = action.payload;
-
-                // Extract movie IDs and update the state
-                // state.movieIdsOfUser = action.payload.map((movie) => movie.movieId); // Extraer los movieIds y guardarlos en el estado
                 return {
                     ...state,
                     loading: false,
@@ -102,8 +71,6 @@ const userMovieSlice = createSlice({
                 };
             })
             .addCase(loadUserMovies.rejected, (state, action: PayloadAction<any>) => {
-                // state.loading = false;
-                // state.error = action.payload;
                 return {
                     ...state,
                     loading: false,

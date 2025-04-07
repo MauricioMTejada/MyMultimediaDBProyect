@@ -52,6 +52,11 @@ const UserMovie = sequelize.define('UserMovie', {
         defaultValue: true,
         allowNull: false
     },
+    currentActive: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: false,
+        allowNull: false
+    },
 }, {
     timestamps: false,
 });
