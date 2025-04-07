@@ -25,8 +25,12 @@ export const renderDatosUsuarioCell = (row: CombinedMovieData | Movie) => {
         setEditable(true);
     };
 
-    const handleDeleteClick = (setEditable: React.Dispatch<React.SetStateAction<boolean>>) => {
-        setEditable(false);
+    const handleDeleteClick = (
+        setEditable: React.Dispatch<React.SetStateAction<boolean>>,
+        resetValue: () => void
+    ) => {
+        setEditable(false); // Desactiva el campo de edición
+        resetValue(); // Restablece el valor al original
     };
 
     const handleWatchedChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
@@ -123,12 +127,16 @@ export const renderDatosUsuarioCell = (row: CombinedMovieData | Movie) => {
                     className={styles.icon}
                     onClick={() => handleEditClick(setIsNoteEditable)}
                 />
-                <img
-                    src="/icons/delete-button.png"
-                    alt="Delete"
-                    className={styles.icon}
-                    onClick={() => handleDeleteClick(setIsNoteEditable)}
-                />
+            <img
+                src="/icons/delete-button.png"
+                alt="Delete"
+                className={styles.icon}
+                onClick={() =>
+                    handleDeleteClick(setIsRecommendationEditable, () =>
+                        setNote(row.note || "")
+                    )
+                }
+            />
                 <b className={styles.text}>Nota:</b>
             </div>
             <textarea
@@ -144,12 +152,16 @@ export const renderDatosUsuarioCell = (row: CombinedMovieData | Movie) => {
                     className={styles.icon}
                     onClick={() => handleEditClick(setIsRecommendationEditable)}
                 />
-                <img
-                    src="/icons/delete-button.png"
-                    alt="Delete"
-                    className={styles.icon}
-                    onClick={() => handleDeleteClick(setIsRecommendationEditable)}
-                />
+            <img
+                src="/icons/delete-button.png"
+                alt="Delete"
+                className={styles.icon}
+                onClick={() =>
+                    handleDeleteClick(setIsRecommendationEditable, () =>
+                        setRecommendationSource(row.recommendationSource || "")
+                    )
+                }
+            />
                 <b className={styles.text}>Origen de Recomendación:</b>
             </div>
             <textarea
