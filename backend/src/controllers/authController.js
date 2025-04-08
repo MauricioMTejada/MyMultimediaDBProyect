@@ -1,19 +1,16 @@
 // backend/src/controllers/authController.js
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-const { User } = require('../models/associations'); // Importar User desde associations
+const { User } = require('../database/models'); // Importar User desde index.js en database/models
 
 const login = async (req, res) => {
     const { username, password } = req.body;
-
-    // console.log('authController.js - Datos recibidos en /login:', { username, password });
 
     try {
         // Buscar al usuario por nombre de usuario
         const user = await User.findOne({ where: { username } });
 
         if (!user) {
-            // console.log('authController.js - Usuario no encontrado');
             return res.status(401).json({ message: 'Credenciales inválidas' });
         }
 
@@ -21,14 +18,12 @@ const login = async (req, res) => {
         const isMatch = await user.comparePassword(password);
 
         if (!isMatch) {
-            // console.log('authController.js - Contraseña incorrecta');
             return res.status(401).json({ message: 'Credenciales inválidas' });
         }
 
         // Crear el token JWT
         const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET, { expiresIn: '1h' });
 
-        // console.log('authController.js - Inicio de sesión exitoso:', { userId: user.id, token });
         res.json({ token, userId: user.id }); // Devolvemos el token y el userId
     } catch (error) {
         console.error('Error en el login:', error);
@@ -60,6 +55,7 @@ const register = async (req, res) => {
             firstName,
             lastName,
         });
+
         // Crear el token JWT
         const token = jwt.sign({ userId: newUser.id }, process.env.JWT_SECRET, { expiresIn: '1h' });
 

@@ -4,9 +4,13 @@ import { CombinedMovieData, Country, UserMovie } from '../types/types';
 
 export const fetchUserMovies = async (): Promise<CombinedMovieData[]> => {
     try {
+        // console.log("Fetching user movies..."); // Log para indicar que se inicia la solicitud
         const response = await api.get('users/usermovies');
+        // console.log("Response status:", response.status); // Log para ver el estado de la respuesta
+        // console.log("Response data:", response.data); // Log para inspeccionar los datos de la respuesta
         return response.data;
     } catch (error: any) {
+        console.error("Error response:", error.response); // Log para inspeccionar el error completo
         throw new Error(error.response?.data?.message || 'Error al obtener las películas del usuario');
     }
 };

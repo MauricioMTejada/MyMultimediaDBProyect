@@ -1,6 +1,4 @@
 // src/controllers/countryController.js
-const { db } = require('../config/database');
-const { Sequelize } = require('sequelize');
 
 const getRandomCountries = (req, res, Country) => { //Recibir Country como parametro
     try {

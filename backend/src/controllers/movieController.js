@@ -1,5 +1,5 @@
 // backend/src/controllers/movieController.js
-const { Movie, UserMovie } = require('../models/associations'); // Importar los modelos
+const { Movie } = require('../database/models'); // Importar los modelos
 
 const getAllMovies = async (req, res) => {
     try {

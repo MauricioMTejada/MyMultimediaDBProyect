@@ -1,5 +1,5 @@
 // src/middleware/userMiddleware.js
-const { db } = require('../config/database'); // Importar db
+const { db } = require('../database/config/database'); // Importar db
 const userController = require('../controllers/userController');
 
 const getUserMoviesMiddleware = async (req, res) => {

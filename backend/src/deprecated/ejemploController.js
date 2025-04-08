@@ -1,5 +1,5 @@
 // src/controllers/ejemploController.js
-const { db } = require('../config/database');
+/* const { db } = require('../config/database');
 const { Ejemplo } = db; //importar el modelo desde db
 
 const getAllEjemplos = async (req, res) => {
@@ -14,4 +14,4 @@ const getAllEjemplos = async (req, res) => {
 
 module.exports = {
     getAllEjemplos
-};
+}; */

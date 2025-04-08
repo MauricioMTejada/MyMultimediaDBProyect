@@ -1,6 +1,5 @@
 // src/controllers/userController.js
-const { db } = require('../config/database'); // Importar db
-const { UserMovie, Movie } = require('../models/associations'); // Importar los modelos UserMovie y Movie
+const { UserMovie, Movie } = require('../database/models'); // Importar los modelos UserMovie y Movie
 
 // Actualizar los datos de UserMovie
 const updateUserMovie = async (req, res) => {

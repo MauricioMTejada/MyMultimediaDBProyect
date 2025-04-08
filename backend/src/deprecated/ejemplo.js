@@ -1,5 +1,5 @@
 // src/models/ejemplo.js
-const { sequelize } = require('../config/database');
+/* const { sequelize } = require('../config/database');
 const { DataTypes } = require('sequelize');
 
 const Ejemplo = sequelize.define('Ejemplo', {
@@ -15,4 +15,4 @@ const Ejemplo = sequelize.define('Ejemplo', {
     }
 });
 
-module.exports = Ejemplo;
+module.exports = Ejemplo; */

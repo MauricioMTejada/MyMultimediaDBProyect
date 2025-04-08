@@ -1,5 +1,5 @@
 // backend/src/models/associations.js
-const { sequelize, db } = require('../config/database');
+/* const { sequelize, db } = require('../config/database');
 const Movie = require('./Movie');
 const Country = require('./Country');
 const Genre = require('./Genre');
@@ -41,4 +41,4 @@ module.exports = {
     UserMovie,
     Ejemplo,
     User,
-};
+}; */

@@ -1,11 +1,11 @@
 // backend/src/middleware/countryMiddleware.js
-const { db } = require('../config/database'); //importar db
+const { Country } = require('../database/models'); //importar db
 const countryController = require('../controllers/countryController');
 
 const getRandomCountriesMiddleware = async (req, res) => {
     try {
         // Obtener todos los paises
-        const allCountries = await db.Country.findAll(); //Utilizar el modelo desde db
+        const allCountries = await Country.findAll(); //Utilizar el modelo desde db
 
         // Si no hay paises, retornar error
         if (allCountries.length === 0) {
@@ -33,7 +33,7 @@ const getRandomCountriesMiddleware = async (req, res) => {
         req.randomCountries = randomCountries;
 
         // Llamar al controlador y pasarle req,res y el modelo
-        countryController.getRandomCountries(req, res, db.Country); //pasar db.Country
+        countryController.getRandomCountries(req, res, Country); //pasar db.Country
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: 'Error al obtener los paises aleatorios' });
@@ -43,7 +43,7 @@ const getRandomCountriesMiddleware = async (req, res) => {
 const getAllCountriesMiddleware = async (req, res) => {
     try {
         // Obtener todos los paises
-        const allCountries = await db.Country.findAll({ //utilizar el modelo desde db
+        const allCountries = await Country.findAll({ //utilizar el modelo desde db
             attributes: ['id', 'name'], // Solo necesitamos el ID y el nombre
             order: [['name', 'ASC']] //Orden ascendente por nombre.
         });
@@ -54,7 +54,7 @@ const getAllCountriesMiddleware = async (req, res) => {
         // Agregar los paises seleccionados a la req. para usar en el controller.
         req.allCountries = allCountries;
         // Llamar al controlador y pasarle req,res y el modelo.
-        countryController.getAllCountries(req, res, db.Country); //pasar db.Country
+        countryController.getAllCountries(req, res, Country); //pasar db.Country
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: 'Error al obtener todos los paises.' });

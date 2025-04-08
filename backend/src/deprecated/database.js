@@ -1,5 +1,5 @@
 // config/database.js
-const { Sequelize } = require('sequelize');
+/* const { Sequelize } = require('sequelize');
 require('dotenv').config();
 
 const sequelize = new Sequelize({
@@ -26,4 +26,4 @@ sequelize.authenticate()
     });
 
 //exportar db y sequelize
-module.exports = { sequelize, db };
+module.exports = { sequelize, db }; */
