@@ -1,10 +1,10 @@
 // src/components/Table/TableBody.tsx
 import React from 'react';
 import TableCell from './TableCell';
-import { CombinedMovieData, Movie } from '../../types/types';
+import { MovieWithUserMovie, Movie } from '../../types/types';
 
 interface Props {
-    data: (CombinedMovieData | Movie)[]; // Allow both types
+    data: (MovieWithUserMovie | Movie)[]; // Allow both types
     headers: string[];
 }
 

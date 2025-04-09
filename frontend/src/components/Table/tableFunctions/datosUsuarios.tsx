@@ -2,9 +2,9 @@
 import styles from './datosUsuarios.module.css';
 import React, { useState, useEffect } from 'react';
 import { submitUserMovieForm } from '../../../services/userMovieService';
-import { CombinedMovieData, Movie } from '../../../types/types';
+import { MovieWithUserMovie, Movie } from '../../../types/types';
 
-export const renderDatosUsuarioCell = (row: CombinedMovieData | Movie) => {
+export const renderDatosUsuarioCell = (row: MovieWithUserMovie) => {
     const [isNoteEditable, setIsNoteEditable] = useState(false);
     const [isRecommendationEditable, setIsRecommendationEditable] = useState(false);
     const [watchedStatus, setWatchedStatus] = useState(row.watched || "No");
@@ -34,7 +34,7 @@ export const renderDatosUsuarioCell = (row: CombinedMovieData | Movie) => {
     };
 
     const handleWatchedChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-        setWatchedStatus(event.target.value);
+        // setWatchedStatus(event.target.value);
     };
 
     const handleNoteChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {

@@ -36,8 +36,8 @@ const TableUpload: React.FC<Props> = ({ data, onCountryChange }) => {
             case "Imagen":
                 return (
                     <img
-                        src={row.Imagen}
-                        alt={`Imagen de ${row.Título}`}
+                        src={row.image}
+                        alt={`Imagen de ${row.title}`}
                         className={styles.verticalTableImage}
                     />
                 );
@@ -61,7 +61,7 @@ const TableUpload: React.FC<Props> = ({ data, onCountryChange }) => {
                     <div className={styles.verticalTableCountryBox}>
                         <CountryDropdown
                             onChange={(newCountryId) => onCountryChange(rowIndex, newCountryId)}
-                            label={`Seleccionar país para la película ${row.Título}`}
+                            label={`Seleccionar país para la película ${row.title}`}
                         />
                         <div className={styles.verticalTableCsvCountry}>csvCountry: {row.csvCountry}</div>
                     </div>

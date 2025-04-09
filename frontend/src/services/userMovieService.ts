@@ -1,8 +1,8 @@
 // frontend/src/services/userMovieService.ts
 import { api } from '../utils/apiConfig';
-import { CombinedMovieData, Country, UserMovie } from '../types/types';
+import { MovieWithUserMovie, Country, UserMovie } from '../types/types';
 
-export const fetchUserMovies = async (): Promise<CombinedMovieData[]> => {
+export const fetchUserMovies = async (): Promise<MovieWithUserMovie[]> => {
     try {
         // console.log("Fetching user movies..."); // Log para indicar que se inicia la solicitud
         const response = await api.get('users/usermovies');

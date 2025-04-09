@@ -1,5 +1,6 @@
 //src/types/types.ts
 export interface Movie {
+    movieId: number;
     title: string;
     originalTitle: string;
     year: number;
@@ -14,8 +15,7 @@ export interface Movie {
     countryId?: number;
     csvCountry?: string;
     otherTitles: string[];
-    isAsocied?: boolean; // Indica si la película está asociada al usuario
-    [key: string]: any;
+    isAssociated?: boolean; // Indica si la película está asociada al usuario, se agrega en el backend
 }
 
 export interface UserMovie {
@@ -40,19 +40,6 @@ export interface Country {
     id: number;
     name: string;
 }
-
-export interface CombinedMovieData extends Movie {
-    // userMovieId: number;
-    userId: number;
-    watched: 'Si' | 'No' | 'Viendo'; // Ahora es obligatorio
-    watchedDate?: Date | null; // Opcional
-    rewatchedDate?: Date[] | null; // Opcional
-    type?: 'Película' | 'Serie' | 'Documental'; // Opcional
-    note?: string | null; // Opcional
-    recommendationSource?: string | null; // Opcional
-    selectOriginalTitle: boolean;
-}
-
 
 export interface LoginCredentials {
     username: string;

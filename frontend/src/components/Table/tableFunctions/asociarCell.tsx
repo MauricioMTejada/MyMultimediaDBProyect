@@ -1,12 +1,12 @@
 import React from 'react';
-import { CombinedMovieData, Movie } from '../../../types/types';
+import { MovieWithUserMovie, Movie } from '../../../types/types';
 import { addAssociateUserMovieService, deleteAssociateUserMovieService } from '../../../services/userMovieService';
 import { addAssociateUserMovie, removeAssociateUserMovie } from '../../../redux/slices/userMovieSlice';
 import { useAppDispatch } from '../../../redux/hooks';
 import styles from './asociarCell.module.css';
 
 export const renderAsociarCell = (
-    row: CombinedMovieData | Movie,
+    row: MovieWithUserMovie | Movie,
     localChecked: boolean,
     setLocalChecked: React.Dispatch<React.SetStateAction<boolean>>,
 ) => {

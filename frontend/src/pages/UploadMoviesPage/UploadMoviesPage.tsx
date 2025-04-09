@@ -33,7 +33,7 @@ const UploadMoviesPage: React.FC = () => {
                 } else {
                     const newData: MovieWithCSVCountry[] = results.data.map((movie) => ({
                         ...movie,
-                        csvCountry: movie.País,
+                        csvCountry: movie.country,
                         countryId: undefined, // Inicializamos countryId como undefined
                     }));
                     setData(newData);
